@@ -1,0 +1,213 @@
+body {
+	margin-top: 100px;
+	background-color: #A4A4A4;
+	color: #A4A4A4;
+	font-family: "Arial", Verdana, Sans-serif;
+}
+
+
+
+
+label {
+    color: #A4A4A4;
+    float: left;
+    line-height: 14px;
+    padding-top: 3px;
+    text-align: right;
+    width: 110px;
+}
+
+label.labelLeft {
+	text-align: left;
+	margin-left: 3px;
+}
+
+label.labelWall {
+	margin-top: 2px;
+	text-align: left;
+}
+
+textarea {
+	width: 300px;
+
+}
+
+input{
+	float: right;
+}
+
+input[type=submit] {
+	height: 20px;
+}
+
+label, input, select{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: normal;
+    float: left;
+}
+
+
+input, select {
+    -moz-border-radius: 1px 1px 1px 1px;
+    border: 1px solid #CCCCCC;
+    color: #A4A4A4;
+    display: inline-block;
+    font-size: 13px;
+    height: 14px;
+    line-height: 14px;
+    padding: 3px;
+    width: 120px;
+}
+
+button {
+    -moz-border-radius: 1px 1px 1px 1px;
+    border: 1px solid #CCCCCC;
+    color: #A4A4A4;
+    display: inline-block;
+    font-size: 13px;
+    height: 20px;
+    line-height: 14px;
+    padding: 3px;
+    width: 128px;
+}
+
+
+select {
+    height: 27px;
+    line-height: 14px;
+}
+
+form .input {
+    margin-left: 150px;
+}
+
+form .line {
+    margin-bottom: 5px;
+}
+
+div.submitButton {
+	height: 20px;
+	width: 120px;
+	float: right;
+	padding-right: 12px;
+}
+
+div.outer{
+	width: 600px;
+	height: 400px;
+	
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.logo{
+	float: left;
+	width: 340px;
+	height: 400px;
+}
+
+div.right{
+	margin-left: 10px;
+	float: left;
+	width: 250px;
+}
+div.signIn{ 
+	height: 100px;
+	width: 250px;
+	background-color:white;
+}
+
+div.signUp{
+	margin-top: 10px;
+	height: 290px;
+	width: 250px;
+	background-color: white;
+}
+
+div.line{
+	float: left;
+	clear: both;
+	padding-top: 5px;
+	position: relative;
+}
+
+div.wallOfText{
+	float: left;
+}
+
+
+div.container{
+	width: 600px;
+	height: 400px;
+	
+	margin-left: auto;
+	margin-right: auto;
+
+	background-color: white;
+}
+
+div.content{
+	float: left;
+}
+
+div.wall{
+	float: left;
+	margin-left: 20px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 350px;
+}
+
+
+div.info{
+	float: left;
+	margin-left: 20px;
+	height: 350px;
+	width: 250px;
+}
+
+div.menuButton{
+	width: 198px;
+	height: 50px;
+	float: left;
+	text-align: center;
+	font-size: 36px;
+	border:1px solid #616F8B;
+
+
+	background-color: white;
+}
+
+div.menuButton:hover{
+	background-color: #00153E;
+}
+
+div.home{
+	display: block;
+}
+
+div.browse{
+	 display: none;
+}
+
+div.account{
+	 display: none;
+}
+
+.show {
+    display: block;
+}
+
+.hide {
+    display: none;
+}
+
+.selected {
+    
+    font:bold;
+
+}
+
+

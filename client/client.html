@@ -1,0 +1,196 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+		<title>Hej</title>
+		<link href="client.css" type="text/css" rel="stylesheet">
+		<script src="client.js" type="text/javascript"></script>
+		<script src="serverstub.js" type="text/javascript"></script>
+		<script id="welcomeview" type="text/view">
+			<div class="outer">
+			<div class="logo">
+				<img src="wimage.png" alt="Twiddler" style="width:340px;height:400px">
+			</div>
+			<div class="right">
+				<!-- -------------------Login---------------------- -->
+				<div class="signIn">
+					<form onsubmit="validatelogin()">
+					<div class="line">
+							<label for="input">Username (email):</label>
+							<input type="email" id="email2" required name="input">
+						</div>
+						<div class="line">
+							<label for="input">Password:</label>
+							<input type="password" pattern=".{5,}" id="password" required name="input">
+						</div>
+						<div class="submitButton">
+							<input type ="submit" value="Login">
+						</div>
+					</form>
+				</div>
+				<!-- -------------------Sign up----------------------- -->
+				<div class="signUp">
+					<form onsubmit="validatesignup()">
+						<div class="line"> 
+							<label for="input">Email: </label>
+							<input type="email" id="email"required name="input">
+						</div>
+						<div class="line"> 
+							<label for="input">Password: </label>
+							<input type="password" pattern=".{5,}" id="password1" required name="input">
+						</div>
+						<div class="line"> 
+							<label for="input">Repeat password: </label>
+							<input type="password" pattern=".{5,}" id="password2" required name="input">
+						</div>
+						<div class="line"> 
+							<label for="input">First name: </label>
+							<input type="text" id="fname" required name="input">
+						</div>
+						<div class="line"> 
+							<label for="input">Family name: </label>
+							<input type="text" id="lname" required name="input">
+						</div>
+						<div class="line"> 
+							<label for="input">Gender: </label>
+							<select name="dropdown" id="gender" name="input">
+								<option value="Male" selected>Male</option>
+								<option value="Female" selected>Female</option>
+							</select>
+						</div>
+						<div class="line"> 
+							<label for="input">City: </label>
+							<input type="text" id="city" required name="input">
+						</div>
+						<div class="line"> 
+							<label for="input">Country: </label>
+							<input type="text" id="country" required name="input">
+						</div>
+						<div class="submitButton"> 
+							<input type ="submit" value="Sign up">
+						</div>
+					</form>
+				</div>
+			</div>
+		</script>
+		<script id="profileview" type="text/view">		
+			<div class="container">
+				<div class="tabs">
+					<div class="menuButton"  id="home" onclick="changeView(this)">
+						Home
+					</div>
+					<div class="menuButton"  id="browse" onclick="changeView(this)">
+						Browse
+					</div>
+					<div class="menuButton" id="account" onclick="changeView(this)">
+						Account
+					</div>
+				</div>
+				<!-- -------------------HOME----------------------- -->
+				<div class="content" id="homeContent">
+					<div  class="info" id="userInfo">
+						<div class="line">
+							<label>Email: </label><label class="labelLeft" id="showEmailhome"></label>
+						</div><br>
+						<div class="line">
+							<label>First name: </label><label class="labelLeft" id="showFNamehome"></label> 
+						</div><br>
+						<div class="line">
+							<label>Family name: </label><label class="labelLeft" id="showLNamehome"></label>
+						</div><br>
+						<div class="line">
+							<label>Gender: </label><label class="labelLeft" id="showGenderhome"></label>
+						</div><br>
+						<div class="line">
+							<label>City: </label><label class="labelLeft" id="showCityhome"></label>
+						</div><br>
+						<div class="line">
+							<label>Country: </label><label class="labelLeft" id="showCountryhome"></label>
+						</div><br>
+					</div>
+
+					<div class="wall" id="userWall">
+						
+						<textarea id="message" placeholder="Write a message"></textarea><br>
+						<button onclick="postMessage()">Send</button>
+						<button onclick="updateWall()"> Update </button> <br>
+
+						<div id="messageWallHome" class="wallOfText">
+
+						</div>
+						
+					</div>
+				</div>
+				<!-- -------------------BROWSE----------------------- -->
+				<div class="content" id="browseContent">
+					<div class=info>
+						<div>
+							<label class="labelLeft" id="findUserLabel">Find user:</label>
+							<form>
+								<div class="line">
+									<input type="email" id="userId">
+								</div>
+								<div class="line">
+									<button onclick="findUser()" >Find</button>
+								</div>
+							</form>
+						</div>
+						<div id="userInfo2" class="hide">
+							<div class="line">
+								<label>Email: </label><label class="labelLeft" id="showEmailbrowse"></label>
+							</div><br>
+							<div class="line">
+								<label>First name: </label><label class="labelLeft" id="showFNamebrowse"></label> 
+							</div><br>
+							<div class="line">
+								<label>Family name: </label><label class="labelLeft" id="showLNamebrowse"></label>
+							</div><br>
+							<div class="line">
+								<label>Gender: </label><label class="labelLeft" id="showGenderbrowse"></label>
+							</div><br>
+							<div class="line">
+								<label>City: </label><label class="labelLeft" id="showCitybrowse"></label>
+							</div><br>
+							<div class="line">
+								<label>Country: </label><label class="labelLeft" id="showCountrybrowse"></label>
+							</div><br>
+						</div>
+					</div>
+					<div class=wall>
+						<div id="userWall2" class="hide">
+							<textarea id="messageBrowse" placeholder="Write a message"></textarea><br>
+							<button onclick="postMessageBrowse()">Send</button>
+							<button onclick="updateWall2()"> Update </button> <br>
+							<div id="messageWallBrowse" class="wallOfText"></div>
+						</div>
+					</div>
+				</div>
+				<!-- -------------------ACCOUNT----------------------- -->
+				<div class="content" id="accountContent">
+					<form>
+						<div class="line">
+							<label>Current password: </label>
+							<input type="password" pattern=".{5,}" id="currentPass" required><br>
+						</div>
+						<div class="line">
+							<label>New password:</label>
+							<input type="password" pattern=".{5,}" id="changePass1" required><br>
+						</div>
+						<div class="line">
+							<label>Repeat password: </label>
+							<input type="password" pattern=".{5,}" id="changePass2" required><br>
+						</div>
+						<div class="line">
+							<button type ="submit" onclick="changePassword()">Change password</button>
+							<button onclick="signOut()">Sign out</button>
+							
+						</div>
+					</form>
+					
+				</div>
+			</div>
+		</script>
+	</head>
+	<body>
+		<div id="view"></div>
+	</body>
+</html>
