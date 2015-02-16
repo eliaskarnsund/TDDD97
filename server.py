@@ -7,7 +7,7 @@ app = Flask(__name__)
  
 @app.route('/')
 def home():
-    return 'hello sir'
+	return 'hello sir'
 
 @app.route('/signin')
 def sign_in(email, password):
@@ -18,7 +18,8 @@ def sign_up(email, password, firstname, familyname, gender, city, country):
 	if request.method == 'POST':
 		# TODO add to database
 		# database_helper.addUser(email, password, firstname, familyname, gender, city, country);
-	return
+		return
+
 
 @app.route('/signout')
 def sign_out(token):
@@ -49,9 +50,6 @@ def post_message(token, message, email):
 	return
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(host = '0.0.0.0', port = 5000)
-
-
-
-
+	# database_helper.init_db(app)
+	app.debug = True
+	app.run(host = '0.0.0.0', port = 5000)
