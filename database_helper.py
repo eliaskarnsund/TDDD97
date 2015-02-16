@@ -24,6 +24,20 @@ def close_db():
 	if db is not None:
 		db.close()
 
+def add_user(email, password, firstname, familyname, gender, city, country):
+	query_db('INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?)', [email, password, firstname, familyname, gender, city, country])
+	return
+
+
+def query_db(query, args=(), one=False):
+	db=get_db()
+	cur = db.execute(query, args)
+	rv = cur.fetchall()
+	print rv
+	cur.close()
+	db.commit()
+	return (rv[0] if rv else None) if one else rv
+
 def init_db(app):
 	with app.app_context():
 		db = get_db()

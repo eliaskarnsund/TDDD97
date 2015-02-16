@@ -14,12 +14,18 @@ def sign_in(email, password):
 	return
 
 @app.route('/signup', methods=['POST'])
-def sign_up(email, password, firstname, familyname, gender, city, country):
+def sign_up():
 	if request.method == 'POST':
-		# TODO add to database
-		# database_helper.addUser(email, password, firstname, familyname, gender, city, country);
-		return
+		email = request.form['email']
+		password = request.form['password']
+		firstname = request.form['firstname']
+		familyname = request.form['familyname']
+		gender = request.form['gender']
+		city = request.form['city']
+		country = request.form['country']
 
+		database_helper.add_user(email, password, firstname, familyname, gender, city, country)
+		return 'added'
 
 @app.route('/signout')
 def sign_out(token):
