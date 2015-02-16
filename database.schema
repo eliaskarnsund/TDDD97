@@ -1,0 +1,10 @@
+CREATE TABLE user(
+email VARCHAR(30),
+password VARCHAR(30),
+firstname VARCHAR(30),
+familyname VARCHAR(30),
+gender VARCHAR(30),
+city VARCHAR(30),
+country VARCHAR(30),
+PRIMARY KEY(email)
+);
