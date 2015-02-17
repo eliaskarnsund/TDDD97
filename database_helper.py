@@ -47,9 +47,9 @@ def get_user(email):
 	return userInfo
 
 def get_logged_in_user(token):
-	userInfo = query_db('SELECT * FROM loggedInUser AS U WHERE U.token = ?', [token], True)
+	userInfo = query_db('SELECT * FROM loggedInUsers AS U WHERE U.token = ?', [token], True)
 	return userInfo
 
 def add_logged_in_user(email, token):
-	query_db('INSERT INTO loggedInUser VALUES (?,?)', [email, token])
+	query_db('INSERT INTO loggedInUsers VALUES (?,?)', [email, token])
 	return

@@ -20,7 +20,9 @@ def sign_in():
 	if user == None:
 		return 'This user does not exist'
 	elif verifyPassword(password, user[1]):
+		#TODO: fixa tokengenerering och kolla om user är inloggad redan
 		token ="token";
+		database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
 		return 'wrong password'
