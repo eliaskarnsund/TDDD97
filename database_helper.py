@@ -46,6 +46,10 @@ def get_user(email):
 	userInfo = query_db('SELECT * FROM user AS U WHERE U.email = ?', [email], True)
 	return userInfo
 
+def get_user_by_token(token):
+	userInfo = query_db('SELECT * FROM user WHERE token = ?', [token], True)
+	return userInfo
+
 def get_logged_in_user(token):
 	userInfo = query_db('SELECT * FROM loggedInUsers AS U WHERE U.token = ?', [token], True)
 	return userInfo

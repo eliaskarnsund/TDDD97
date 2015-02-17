@@ -55,13 +55,31 @@ def sign_out():
 def change_password(token, old_password, new_password):
 	return
 
-@app.route('/getuserdatabytoken')
-def get_user_data_by_token(token):
-	return
+@app.route('/getuserdatabytoken', methods=['POST'])
+def get_user_data_by_token():
+	userInfo = database_helper.get_logged_in_user(request.form['token'])
+	if userInfo is None:
+		return json.dumps({"success": False, "message": "You are not signed in."})
+	else:
+		email = userInfo[0]
+		return get_user_data(email)
 
-@app.route('/getuserdatabyemail')
-def get_user_data_by_email(token, email):
-	return
+@app.route('/getuserdatabyemail', methods=['POST'])
+def get_user_data_by_email():
+	email = request.form['email']
+	token = request.form['token']
+	if database_helper.get_logged_in_user(token)[0] != email:
+		return json.dumps({"success": False, "message": "You are not signed in."})
+	else:
+		return get_user_data(email)
+
+def get_user_data(email):
+	userInfo = database_helper.get_user(email)
+	if userInfo is None:
+		return json.dumps({"success": False, "message": "No such user."})
+	else:
+		user=[userInfo[0],userInfo[2], userInfo[3], userInfo[4], userInfo[5], userInfo[6]]
+		return json.dumps({"success": True, "message": "User data retrieved.", "data": user})
 
 @app.route('/getusermessagesbytoken')
 def get_user_messages_by_token(token):
