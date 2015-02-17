@@ -53,3 +53,7 @@ def get_logged_in_user(token):
 def add_logged_in_user(email, token):
 	query_db('INSERT INTO loggedInUsers VALUES (?,?)', [email, token])
 	return
+
+def remove_logged_in_user(token):
+	query_db('DELETE FROM loggedInUsers WHERE token = ?', [token])
+	return
