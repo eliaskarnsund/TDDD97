@@ -26,7 +26,6 @@ def add_user(email, password, firstname, familyname, gender, city, country):
 	query_db('INSERT INTO user VALUES (?, ?, ?, ?, ?, ?, ?)', [email, password, firstname, familyname, gender, city, country])
 	return
 
-
 def query_db(query, args=(), one=False):
 	db=get_db()
 	cur = db.execute(query, args)
@@ -43,10 +42,14 @@ def init_db(app):
 			db.cursor().executescript(f.read())
 		db.commit()
 
-def getUser(email):
-	cur = get_db().cursor()
-	query = 'SELECT * FROM user AS U WHERE U.email = ?'
-	cur.execute(query, [email])
-	userInfo = cur.fetchone()
+def get_user(email):
+	userInfo = query_db('SELECT * FROM user AS U WHERE U.email = ?', [email], True)
 	return userInfo
 
+def get_logged_in_user(token):
+	userInfo = query_db('SELECT * FROM loggedInUser AS U WHERE U.token = ?', [token], True)
+	return userInfo
+
+def add_logged_in_user(email, token):
+	query_db('INSERT INTO loggedInUser VALUES (?,?)', [email, token])
+	return

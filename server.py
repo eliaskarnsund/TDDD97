@@ -14,22 +14,16 @@ def home():
 
 @app.route('/signin', methods=['POST'])
 def sign_in():
-	var email = request.form['email']
-	var password = request.form['password']
-	user = database_helper.getUser(email)
+	email = request.form['email']
+	password = request.form['password']
+	user = database_helper.get_user(email)
 	if user == None:
 		return 'This user does not exist'
 	elif verifyPassword(password, user[1]):
-		 var token = "";
-        for (var i = 0 ; i < 36 ; ++i) {
-            token += letters[Math.floor(Math.random() * letters.length)];
-        }
-		#TODO: Check if logged in
+		token ="token";
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
 		return 'wrong password'
-
-	return
 
 @app.route('/signup', methods=['POST'])
 def sign_up():
@@ -73,11 +67,6 @@ def get_user_messagaes_by_email(token, email):
 def post_message(token, message, email):
 	return
 
-if __name__ == '__main__':
-	# database_helper.init_db(app)
-	app.debug = True
-	app.run(host = '0.0.0.0', port = 5000)
-
 def hashPassword(password):
 	salt = uuid.uuid4().hex
 	hashedPassword = hashlib.sha512(password + salt).hexdigest()
@@ -86,3 +75,8 @@ def hashPassword(password):
 def verifyPassword(password, databasePass):
 	#reHashed = hashPassword(password)
 	return password == databasePass
+
+if __name__ == '__main__':
+	# database_helper.init_db(app)
+	app.debug = True
+	app.run(host = '0.0.0.0', port = 5000)
