@@ -53,3 +53,10 @@ def get_logged_in_user(token):
 def add_logged_in_user(email, token):
 	query_db('INSERT INTO loggedInUsers VALUES (?,?)', [email, token])
 	return
+
+def set_password(email ,new_password):
+	query_db('UPDATE user SET password=? WHERE email=?',[new_password, email])
+	return
+
+def row_exists(table, column, value):
+	query_db('SELECT EXISTS(SELECT 1 FROM ? WHERE ?=? LIMIT 1);',[table, column, value])

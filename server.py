@@ -4,6 +4,7 @@ from flask import app, request, render_template
 import hashlib, uuid
 import database_helper
 import json
+import string, random
 
 app = Flask(__name__)      
  
@@ -20,8 +21,8 @@ def sign_in():
 	if user == None:
 		return 'This user does not exist'
 	elif verifyPassword(password, user[1]):
-		#TODO: fixa tokengenerering och kolla om user är inloggad redan
-		token ="token";
+		#TODO fixa tokengenerering och kolla om user ar inloggad redan
+		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
 		database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
@@ -45,9 +46,21 @@ def sign_up():
 def sign_out(token):
 	return
 
-@app.route('/changepassword')
-def change_password(token, old_password, new_password):
-	return
+@app.route('/changepassword', methods=['POST'])
+def change_password():
+	token = request.form['token']
+	old_password = request.form['old_password']
+	new_password = request.form['new_password']
+
+	user = database_helper.get_logged_in_user(token)
+	if user != None:
+		email = user[0]
+		current_password = database_helper.get_user(email)[1]
+		if current_password == old_password:
+			database_helper.set_password(email, new_password)
+			return json.dumps({"success": True, "message": "Password changed."})
+		return json.dumps({"success": False, "message": "Wrong password."})
+	return json.dumps({"success": False, "message": "Not logged in."})
 
 @app.route('/getuserdatabytoken')
 def get_user_data_by_token(token):
