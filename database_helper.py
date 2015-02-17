@@ -4,11 +4,9 @@ from flask import g
 conn = sqlite3.connect('database.db')
 c = conn.cursor()
 
-
 DATABASE = 'database.db'
 
 #Create table
-
 
 def get_db(): 
 	db = getattr(g, '_database', None)
@@ -30,3 +28,11 @@ def init_db(app):
 		with app.open_resource('database.schema', mode='r') as f:
 			db.cursor().executescript(f.read())
 		db.commit()
+
+def getUser(email):
+	cur = get_db().cursor()
+	query = 'SELECT * FROM user AS U WHERE U.email = ?'
+	cur.execute(query, [email])
+	userInfo = cur.fetchone()
+	return userInfo
+

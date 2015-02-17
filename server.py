@@ -1,16 +1,34 @@
 
 from flask import Flask 
 from flask import app, request, render_template
+import hashlib, uuid
 import database_helper
+import json
 
 app = Flask(__name__)      
  
 @app.route('/')
 def home():
+	database_helper.get_db()
 	return 'hello sir'
 
-@app.route('/signin')
-def sign_in(email, password):
+@app.route('/signin', methods=['POST'])
+def sign_in():
+	var email = request.form['email']
+	var password = request.form['password']
+	user = database_helper.getUser(email)
+	if user == None:
+		return 'This user does not exist'
+	elif verifyPassword(password, user[1]):
+		 var token = "";
+        for (var i = 0 ; i < 36 ; ++i) {
+            token += letters[Math.floor(Math.random() * letters.length)];
+        }
+		#TODO: Check if logged in
+		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
+	else:
+		return 'wrong password'
+
 	return
 
 @app.route('/signup', methods=['POST'])
@@ -53,3 +71,12 @@ if __name__ == '__main__':
 	# database_helper.init_db(app)
 	app.debug = True
 	app.run(host = '0.0.0.0', port = 5000)
+
+def hashPassword(password):
+	salt = uuid.uuid4().hex
+	hashedPassword = hashlib.sha512(password + salt).hexdigest()
+	return hashedPass
+
+def verifyPassword(password, databasePass):
+	#reHashed = hashPassword(password)
+	return password == databasePass
