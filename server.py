@@ -21,9 +21,11 @@ def sign_in():
 	if user == None:
 		return 'This user does not exist'
 	elif verifyPassword(password, user[1]):
-		#TODO fixa tokengenerering och kolla om user ar inloggad redan
 		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
-		database_helper.add_logged_in_user(email, token)
+		if database_helper.get_logged_in_user(token):
+			return 'already logged in'
+		else:
+			database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
 		return 'wrong password'
@@ -42,9 +44,13 @@ def sign_up():
 		database_helper.add_user(email, password, firstname, familyname, gender, city, country)
 		return 'added'
 
-@app.route('/signout')
-def sign_out(token):
-	return
+@app.route('/signout', methods=['POST'])
+def sign_out():
+	if database_helper.get_logged_in_user(request.form['token']):
+		database_helper.remove_logged_in_user(request.form['token'])
+		return json.dumps({"success": True, "message": "Successfully signed out."})
+	else:
+		return json.dumps({"success": False, "message": "You are not signed in"})
 
 @app.route('/changepassword', methods=['POST'])
 def change_password():
