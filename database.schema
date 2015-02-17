@@ -8,3 +8,9 @@ city VARCHAR(30),
 country VARCHAR(30),
 PRIMARY KEY(email)
 );
+
+CREATE TABLE loggen(
+email VARCHAR(30),
+token VARCHAR(30),
+PRIMARY KEY(email)
+);
