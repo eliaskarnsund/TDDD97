@@ -46,10 +46,6 @@ def get_user(email):
 	userInfo = query_db('SELECT * FROM user AS U WHERE U.email = ?', [email], True)
 	return userInfo
 
-def get_user_by_token(token):
-	userInfo = query_db('SELECT * FROM user WHERE token = ?', [token], True)
-	return userInfo
-
 def get_logged_in_user(token):
 	userInfo = query_db('SELECT * FROM loggedInUsers AS U WHERE U.token = ?', [token], True)
 	return userInfo
@@ -59,7 +55,7 @@ def add_logged_in_user(email, token):
 	return
 
 def add_user_message(toEmail, fromEmail, message):
-	query_db('INSERT INTO userMessages VALUES (?,?,?)', [toEmail, fromEmail,message])
+	query_db('INSERT INTO userMessages VALUES (?,?,?)', [toEmail, fromEmail, message])
 	return
 
 def get_user_messages(email):

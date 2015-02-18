@@ -9,8 +9,15 @@ country VARCHAR(30),
 PRIMARY KEY(email)
 );
 
-CREATE TABLE loggen(
+CREATE TABLE loggedInUsers(
 email VARCHAR(30),
 token VARCHAR(30),
 PRIMARY KEY(email)
+);
+
+CREATE TABLE userMessages(
+toEmail VARCHAR(30),
+fromEmail VARCHAR(30),
+message VARCHAR(144),
+PRIMARY KEY(toEmail, fromEmail, message)
 );
