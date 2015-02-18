@@ -81,7 +81,7 @@ def get_user_data_by_token():
 def get_user_data_by_email():
 	email = request.form['email']
 	token = request.form['token']
-	if database_helper.get_logged_in_user(token)[0] != email:
+	if database_helper.get_logged_in_user(token) is None:
 		return json.dumps({"success": False, "message": "You are not signed in."})
 	else:
 		return get_user_data(email)
