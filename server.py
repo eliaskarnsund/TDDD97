@@ -77,10 +77,10 @@ def get_user_data_by_token():
 		email = userInfo[0]
 		return get_user_data(email)
 
-@app.route('/getuserdatabyemail', methods=['POST'])
-def get_user_data_by_email():
-	email = request.form['email']
-	token = request.form['token']
+@app.route('/getuserdatabyemail/<email>/<token>', methods=['GET'])
+def get_user_data_by_email(email=None, token=None):
+	#email = request.form['email']
+	#token = request.form['token']
 	if database_helper.get_logged_in_user(token) is None:
 		return json.dumps({"success": False, "message": "You are not signed in."})
 	else:
