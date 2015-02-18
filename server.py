@@ -68,9 +68,9 @@ def change_password():
 		return json.dumps({"success": False, "message": "Wrong password."})
 	return json.dumps({"success": False, "message": "Not logged in."})
 
-@app.route('/getuserdatabytoken', methods=['POST'])
-def get_user_data_by_token():
-	userInfo = database_helper.get_logged_in_user(request.form['token'])
+@app.route('/getuserdatabytoken/<token>', methods=['GET'])
+def get_user_data_by_token(token=None):
+	userInfo = database_helper.get_logged_in_user(token)
 	if userInfo is None:
 		return json.dumps({"success": False, "message": "You are not signed in."})
 	else:
@@ -79,8 +79,6 @@ def get_user_data_by_token():
 
 @app.route('/getuserdatabyemail/<email>/<token>', methods=['GET'])
 def get_user_data_by_email(email=None, token=None):
-	#email = request.form['email']
-	#token = request.form['token']
 	if database_helper.get_logged_in_user(token) is None:
 		return json.dumps({"success": False, "message": "You are not signed in."})
 	else:
