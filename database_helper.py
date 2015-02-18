@@ -58,6 +58,9 @@ def add_logged_in_user(email, token):
 	query_db('INSERT INTO loggedInUsers VALUES (?,?)', [email, token])
 	return
 
+def set_password(email ,new_password):
+	query_db('UPDATE user SET password=? WHERE email=?',[new_password, email])
+
 def remove_logged_in_user(token):
 	query_db('DELETE FROM loggedInUsers WHERE token = ?', [token])
 	return
