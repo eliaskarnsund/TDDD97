@@ -58,6 +58,14 @@ def add_logged_in_user(email, token):
 	query_db('INSERT INTO loggedInUsers VALUES (?,?)', [email, token])
 	return
 
+def add_user_message(toEmail, fromEmail, message):
+	query_db('INSERT INTO userMessages VALUES (?,?,?)', [toEmail, fromEmail,message])
+	return
+
+def get_user_messages(email):
+	messages = query_db('SELECT * FROM userMessages WHERE toEmail = ?', [email])
+	return messages
+
 def set_password(email ,new_password):
 	query_db('UPDATE user SET password=? WHERE email=?',[new_password, email])
 

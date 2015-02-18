@@ -96,14 +96,24 @@ def get_user_data(email):
 
 @app.route('/getusermessagesbytoken')
 def get_user_messages_by_token(token):
+	# token to email
+	database_helper.get_user_messages(email)
 	return
 
 @app.route('/getusermessagesbyemail')
 def get_user_messagaes_by_email(token, email):
+	
+	# check if logged in
+	if True:
+		database_helper.get_user_messages(email)
 	return
 
 @app.route('/postmessage')
 def post_message(token, message, email):
+
+	# check if logged in 
+	# TODO getusermessagesbytoken
+	database_helper.add_user_message(email, fromEmail, message)
 	return
 
 def hashPassword(password):
