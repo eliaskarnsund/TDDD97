@@ -33,6 +33,7 @@ validatesignup = function(){
 			alert(response.message);
 		}	
 	}
+	return false;
 
 }
 
@@ -45,22 +46,25 @@ validatelogin = function(){
 	}else{
 		alert(response.message);
 	}
+
+	return false;
 }
 
 changePassword = function(){
-		var pass1 = document.getElementById("changePass1").value;
-    	var pass2 = document.getElementById("changePass2").value;
-    	if (pass1 != pass2){
-   		alert("Passwords do not match");
-		} else{
-			var currentPass = document.getElementById("currentPass").value;
-			var response = serverstub.changePassword(localStorage.getItem("token"), currentPass, pass1);
-			alert(response.message);
-			document.getElementById("changePass1").value = "";
-			document.getElementById("changePass2").value = "";
-			document.getElementById("currentPass").value = "";
+	var pass1 = document.getElementById("changePass1").value;
+	var pass2 = document.getElementById("changePass2").value;
+	if (pass1 != pass2){
+		alert("Passwords do not match");
+	} else{
+		var currentPass = document.getElementById("currentPass").value;
+		var response = serverstub.changePassword(localStorage.getItem("token"), currentPass, pass1);
+		alert(response.message);
+		document.getElementById("changePass1").value = "";
+		document.getElementById("changePass2").value = "";
+		document.getElementById("currentPass").value = "";
 
-		}
+	}
+	return false;
 }
 
 signOut = function(){

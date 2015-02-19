@@ -13,7 +13,7 @@
 			<div class="right">
 				<!-- -------------------Login---------------------- -->
 				<div class="signIn">
-					<form onsubmit="return validatelogin()">
+					<form onsubmit="validatelogin()">
 					<div class="line">
 							<label for="input">Username (email):</label>
 							<input type="email" id="email2" required name="input">
@@ -29,7 +29,7 @@
 				</div>
 				<!-- -------------------Sign up----------------------- -->
 				<div class="signUp">
-					<form onsubmit="return validatesignup()">
+					<form onsubmit="validatesignup()">
 						<div class="line"> 
 							<label for="input">Email: </label>
 							<input type="email" id="email"required name="input">
@@ -125,14 +125,14 @@
 					<div class=info>
 						<div>
 							<label class="labelLeft" id="findUserLabel">Find user:</label>
-							<form onsubmit="return findUser()">
+							<form>
 								<div class="line">
 									<input type="email" id="userId">
 								</div>
-								<div class="line">
-									<input type="submit" value="Find">
-							</div>
 							</form>
+							<div class="line">
+									<button onclick="findUser()">Find</button>
+							</div>
 						</div>
 						<div id="userInfo2" class="hide">
 							<div class="line">
@@ -166,7 +166,7 @@
 				</div>
 				<!-- -------------------ACCOUNT----------------------- -->
 				<div class="content" id="accountContent">
-					<form onsubmit="return changePassword()" >
+					<form>
 						<div class="line">
 							<label>Current password: </label>
 							<input type="password" pattern=".{5,}" id="currentPass" required><br>
@@ -180,7 +180,7 @@
 							<input type="password" pattern=".{5,}" id="changePass2" required><br>
 						</div>
 						<div class="line">
-							<input type ="submit" value="Change password">
+							<input type ="submit" onclick="changePassword()" value="Change password">
 							<button onclick="signOut()">Sign out</button>
 							
 						</div>
