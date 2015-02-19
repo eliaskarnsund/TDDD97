@@ -100,21 +100,22 @@ def get_user_messages_by_token(token=None):
 		return json.dumps({"success": True, "message": "Messages retrieved.", "data": messages})
 	return json.dumps({"success": False, "message": "You are not signed in."})
 
-@app.route('/getusermessagesbyemail')
-def get_user_messagaes_by_email(token, email):
-	
-	# check if logged in
-	if True:
-		database_helper.get_user_messages(email)
-	return
+@app.route('/getusermessagesbyemail/<token>/<email>', methods=['GET'])
+def get_user_messagaes_by_email(token=None, email=None):
+	userInfo = database_helper.get_logged_in_user(token)
+	if userInfo != None:
+		messages = database_helper.get_user_messages(email)
+		return json.dumps({"success": True, "message": "Messages retrieved.", "data": messages})
+	return json.dumps({"success": False, "message": "You are not signed in."})
 
-@app.route('/postmessage')
-def post_message(token, message, email):
-
-	# check if logged in 
-	# TODO getusermessagesbytoken
-	database_helper.add_user_message(email, fromEmail, message)
-	return
+@app.route('/postmessage', methods=['POST'])
+def post_message():
+	fromUser = database_helper.get_logged_in_user(request.form['token'])
+	toUser = database_helper.get_user(request.form['email'])
+	if fromUser != None and toUser != None:
+		database_helper.add_user_message(toUser[0], fromUser[0], request.form['message'])
+		return json.dumps({"success": True, "message": "Message posted"})
+	return json.dumps({"success": False, "message": "Message not posted"})
 
 def hashPassword(password):
 	salt = uuid.uuid4().hex
