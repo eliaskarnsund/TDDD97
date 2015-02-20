@@ -90,6 +90,15 @@ changeView = function(a){
     selected.classList.add("show");
     a.classList.add("selected");
 
+    clearAlerts();
+
+}
+
+clearAlerts = function(){
+	var alerts = document.getElementsByClassName("alert");
+	for (var i = alerts.length - 1; i >= 0; i--) {
+		document.getElementById(alerts[i].id).innerHTML = "";
+	};
 }
 
 setupUser = function(view){
