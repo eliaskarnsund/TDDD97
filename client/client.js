@@ -15,7 +15,7 @@ validatesignup = function(){
 	var pass1 = document.getElementById("password1").value;
 	var pass2 = document.getElementById("password2").value;
 	if (pass1 != pass2){
-		alert("Passwords do not match");
+		document.getElementById("labelAlertSignup").innerHTML = "Passwords do not match";
 	}
 	else{
 		var formData = {};
@@ -28,9 +28,9 @@ validatesignup = function(){
 		formData.country = document.getElementById("country").value;
 		var response = serverstub.signUp(formData);
 		if(response.success == true){
-			alert("Sign up seccesful!!!11!1");		
+			document.getElementById("labelAlertSignup").innerHTML = response.message;	
 		} else {
-			alert(response.message);
+			document.getElementById("labelAlertSignup").innerHTML = response.message;
 		}	
 	}
 	return false;
@@ -44,9 +44,8 @@ validatelogin = function(){
 		var token = response.data;
 		localStorage.setItem("token", token);
 	}else{
-		alert(response.message);
+		document.getElementById("labelAlertLogin").innerHTML = response.message;
 	}
-
 	return false;
 }
 
@@ -54,23 +53,23 @@ changePassword = function(){
 	var pass1 = document.getElementById("changePass1").value;
 	var pass2 = document.getElementById("changePass2").value;
 	if (pass1 != pass2){
-		alert("Passwords do not match");
+		document.getElementById("labelAlertChangePw").innerHTML = "Passwords do not match";
 	} else{
 		var currentPass = document.getElementById("currentPass").value;
 		var response = serverstub.changePassword(localStorage.getItem("token"), currentPass, pass1);
-		alert(response.message);
+		document.getElementById("labelAlertChangePw").innerHTML = response.message ;
 		document.getElementById("changePass1").value = "";
 		document.getElementById("changePass2").value = "";
 		document.getElementById("currentPass").value = "";
-
 	}
 	return false;
 }
 
 signOut = function(){
-		var response = serverstub.signOut(localStorage.getItem("token"));
-		localStorage.removeItem("token");
-		displayview("welcomeview");
+	var response = serverstub.signOut(localStorage.getItem("token"));
+	localStorage.removeItem("token");
+	displayview("welcomeview");
+	return false;
 }
 
 changeView = function(a){
@@ -108,9 +107,7 @@ setupUser = function(view){
 		document.getElementById("showCity"+view).innerHTML=response.data.city;
 		document.getElementById("showCountry"+view).innerHTML=response.data.country;
 		updateWall();
-	} else {
-		alert("ERROR! ERROR!");
-	}
+	} 
 }
 
 postMessage = function(){
@@ -124,10 +121,7 @@ postMessage = function(){
 		response2 = serverstub.postMessage(localStorage.getItem("token"), message, email);
 		updateWall();
 		document.getElementById("message").value = "";
-	} else{
-		alert("ERROR!");
-	}
-	
+	} 
 }
 
 postMessageBrowse = function(){
@@ -166,6 +160,7 @@ writeWall = function(page, response){
 }
 
 findUser = function(){
+	document.getElementById("labelAlertFindUser").innerHTML = "";
 	var userId = document.getElementById("userId").value;
 	var response = serverstub.getUserMessagesByEmail(localStorage.getItem("token"), userId);
 	if(response.success){
@@ -176,6 +171,7 @@ findUser = function(){
 		setupUser("browse");
 		updateWall2();
 	} else {
-		alert("Could not find user");
+		document.getElementById("labelAlertFindUser").innerHTML = "Could not find user";
 	}
+	return false;
 };

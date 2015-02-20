@@ -12,7 +12,7 @@ label {
     color: #A4A4A4;
     float: left;
     line-height: 14px;
-    padding-top: 3px;
+    padding-top: 1px;
     text-align: right;
     width: 110px;
 }
@@ -22,9 +22,11 @@ label.labelLeft {
 	margin-left: 3px;
 }
 
-label.labelWall {
+label.alert {
 	margin-top: 2px;
-	text-align: left;
+	text-align: center;
+	color: red;
+	width: 250px;
 }
 
 textarea {
@@ -57,7 +59,7 @@ input, select {
     font-size: 13px;
     height: 14px;
     line-height: 14px;
-    padding: 3px;
+    padding: 1px;
     width: 120px;
 }
 
