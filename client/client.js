@@ -40,9 +40,9 @@ validatesignup = function(){
 validatelogin = function(){
 	var response = serverstub.signIn(document.getElementById("email2").value, document.getElementById("password").value);
 	if(response.success == true){
-		displayview("profileview");
 		var token = response.data;
 		localStorage.setItem("token", token);
+		displayview("profileview");
 	}else{
 		document.getElementById("labelAlertLogin").innerHTML = response.message;
 	}
