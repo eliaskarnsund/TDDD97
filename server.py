@@ -20,16 +20,16 @@ def sign_in():
 	password = request.form['password']
 	user = database_helper.get_user(email)
 	if user == None:
-		return 'This user does not exist'
+		return json.dumps({'success' : False, 'message' : 'This user does not exist'})
 	elif verifyPassword(password, user[1]):
 		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
 		if database_helper.get_logged_in_user(token):
-			return 'already logged in'
+			return json.dumps({'success' : False, 'message' : 'Already logged in'})
 		else:
 			database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
-		return 'wrong password'
+		return json.dumps({'success' : False, 'message' : 'Wrong password'})
 
 @app.route('/signup', methods=['POST'])
 def sign_up():
