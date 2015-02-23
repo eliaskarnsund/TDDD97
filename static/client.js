@@ -18,20 +18,23 @@ validatesignup = function(){
 		document.getElementById("labelAlertSignup").innerHTML = "Passwords do not match";
 	}
 	else{
-		var formData = {};
-		formData.email = document.getElementById("email").value;
-		formData.password = document.getElementById("password1").value;
-		formData.firstname = document.getElementById("fname").value;
-		formData.familyname = document.getElementById("lname").value;
-		formData.gender = document.getElementById("gender").value;
-		formData.city = document.getElementById("city").value;
-		formData.country = document.getElementById("country").value;
-		var response = serverstub.signUp(formData);
-		if(response.success == true){
-			document.getElementById("labelAlertSignup").innerHTML = response.message;	
-		} else {
-			document.getElementById("labelAlertSignup").innerHTML = response.message;
-		}	
+		var formData = "";
+
+		formData += "email="+document.getElementById("email").value+"&";
+		formData += "password="+document.getElementById("password1").value+"&";
+		formData += "fistname="+document.getElementById("fname").value+"&";
+		formData += "familyname="+document.getElementById("lname").value+"&";
+		formData += "gender="+document.getElementById("gender").value+"&";
+		formData += "city="+document.getElementById("city").value+"&";
+		formData += "country="+document.getElementById("country").value;
+		// var response = serverstub.signUp(formData);
+		alert(formData);
+
+		//if(response.success == true){
+		//	document.getElementById("labelAlertSignup").innerHTML = response.message;	
+		//} else {
+		//	document.getElementById("labelAlertSignup").innerHTML = response.message;
+		//}	
 	}
 	return false;
 
