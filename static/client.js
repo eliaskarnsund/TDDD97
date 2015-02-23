@@ -38,10 +38,7 @@ validatesignup = function(){
 }
 
 validatelogin = function(){
-	var xmlhttp;
-	if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
-		xmlhttp=new XMLHttpRequest();
-	}
+	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function(){
 	  if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    var response = JSON.parse(xmlhttp.responseText);
@@ -70,12 +67,17 @@ changePassword = function(){
 	if (pass1 != pass2){
 		document.getElementById("labelAlertChangePw").innerHTML = "Passwords do not match";
 	} else{
-		var currentPass = document.getElementById("currentPass").value;
-		var response = serverstub.changePassword(localStorage.getItem("token"), currentPass, pass1);
-		document.getElementById("labelAlertChangePw").innerHTML = response.message ;
-		document.getElementById("changePass1").value = "";
-		document.getElementById("changePass2").value = "";
-		document.getElementById("currentPass").value = "";
+		var xmlhttp=new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function(){
+		 	if (xmlhttp.readyState==4 && xmlhttp.status==200){
+			    var response = JSON.parse(xmlhttp.responseText);
+				document.getElementById("labelAlertChangePw").innerHTML = response.message;
+				document.getElementById("changePass1").value = "";
+				document.getElementById("changePass2").value = "";
+				document.getElementById("currentPass").value = "";
+		    }
+		}
+		sendPOSTrequest(xmlhttp,"/changepassword", "token=" + localStorage.getItem("token") + "&old_password=" + document.getElementById("currentPass").value + "&new_password="+ pass1 );
 	}
 	return false;
 }
