@@ -2,13 +2,13 @@
 <html>
 	<head>
 		<title>TWIDDER</title>
-		<link href="client.css" type="text/css" rel="stylesheet">
-		<script src="client.js" type="text/javascript"></script>
-		<script src="serverstub.js" type="text/javascript"></script>
+		<link href="{{url_for('static', filename='client.css')}}" type="text/css" rel="stylesheet">
+		<script src="{{url_for('static', filename='client.js')}}" type="text/javascript"></script>
+		<script src="{{url_for('static', filename='serverstub.js')}}" type="text/javascript"></script>
 		<script id="welcomeview" type="text/view">
 			<div class="outer">
 			<div class="logo">
-				<img src="wimage.png" alt="Twiddler" style="width:340px;height:400px">
+				<img src="{{url_for('static', filename='wimage.png')}}" alt="Twiddler" style="width:340px;height:400px">
 			</div>
 			<div class="right">
 				<!-- -------------------Login---------------------- -->

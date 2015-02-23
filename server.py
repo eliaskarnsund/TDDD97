@@ -1,17 +1,18 @@
 
-from flask import Flask 
+from flask import Flask, url_for
 from flask import app, request, render_template
 import hashlib, uuid
 import database_helper
 import json
 import string, random
 
-app = Flask(__name__)      
+app = Flask(__name__)
  
 @app.route('/')
 def home():
 	database_helper.get_db()
-	return 'hello sir'
+	#render_template('static/client.html')
+	return render_template('client.html')
 
 @app.route('/signin', methods=['POST'])
 def sign_in():
