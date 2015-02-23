@@ -38,15 +38,30 @@ validatesignup = function(){
 }
 
 validatelogin = function(){
-	var response = serverstub.signIn(document.getElementById("email2").value, document.getElementById("password").value);
-	if(response.success == true){
-		var token = response.data;
-		localStorage.setItem("token", token);
-		displayview("profileview");
-	}else{
-		document.getElementById("labelAlertLogin").innerHTML = response.message;
+	var xmlhttp;
+	if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp=new XMLHttpRequest();
 	}
+	xmlhttp.onreadystatechange=function(){
+	  if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		    var response = JSON.parse(xmlhttp.responseText);
+			if(response.success == true){
+				var token = response.data;
+				localStorage.setItem("token", token);
+				displayview("profileview");
+			}else{
+				document.getElementById("labelAlertLogin").innerHTML = response.message;
+			}
+	    }
+	}
+	sendPOSTrequest(xmlhttp,"/signin", "email=" + document.getElementById("email2").value + "&password=" + document.getElementById("password").value );
 	return false;
+}
+
+sendPOSTrequest = function(xmlhttp, address, data){
+	xmlhttp.open("POST",address,true);
+	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xmlhttp.send(data);
 }
 
 changePassword = function(){
