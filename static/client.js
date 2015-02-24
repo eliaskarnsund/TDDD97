@@ -60,19 +60,6 @@ validatelogin = function(){
 	return false;
 }
 
-sendPOSTrequest = function(xmlhttp, address, data){
-	xmlhttp.open("POST",address,true);
-	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	xmlhttp.send(data);
-}
-
-
-sendGETrequest = function(xmlhttp, address){
-	xmlhttp.open("GET",address,true);
-	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	xmlhttp.send();
-}
-
 changePassword = function(){
 	var pass1 = document.getElementById("changePass1").value;
 	var pass2 = document.getElementById("changePass2").value;
@@ -123,40 +110,31 @@ changeView = function(a){
 
 }
 
-clearAlerts = function(){
-	var alerts = document.getElementsByClassName("alert");
-	for (var i = alerts.length - 1; i >= 0; i--) {
-		document.getElementById(alerts[i].id).innerHTML = "";
-	};
-}
 
 setupUser = function(view){
-	if(view=="home"){
-		var xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange=function(){
-	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
-		    	var response = JSON.parse(xmlhttp.responseText);
-		    	if (response.success) {
-		    		setUserInfo("home",response.data)
-		    	};
-	    	};
-		};
-		sendGETrequest(xmlhttp, "/getuserdatabytoken/"+localStorage.getItem("token"));
-	} else{
+	
 		// var response = serverstub.getUserDataByEmail(localStorage.getItem("token"), document.getElementById("userId").value);
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function(){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    	var response = JSON.parse(xmlhttp.responseText);
 		    	if (response.success) {
-		    		setUserInfo("browse",response.data)
+		    		if(view=="home"){
+		    			setUserInfo("home",response.data)
+		    		} else {
+		    			setUserInfo("browse",response.data)
+		    		}
+		
 		    	};
 	    	};
 		};
 		var token = localStorage.getItem("token");
-		var email = document.getElementById("userId").value;
-		sendGETrequest(xmlhttp, "/getuserdatabyemail/"+email+"/"+token);
-	}
+		if (view=="home") {
+			sendGETrequest(xmlhttp, "/getuserdatabytoken/"+token);
+		} else {
+			var email = document.getElementById("userId").value;
+			sendGETrequest(xmlhttp, "/getuserdatabyemail/"+email+"/"+token);
+		}
 }
 
 setUserInfo = function(view, data){
@@ -268,3 +246,24 @@ getUserMessagesByEmail = function(token, email){
 		sendGETrequest(xmlhttp, "/getusermessagesbyemail/"+email+"/"+token);
 
 }
+
+clearAlerts = function(){
+	var alerts = document.getElementsByClassName("alert");
+	for (var i = alerts.length - 1; i >= 0; i--) {
+		document.getElementById(alerts[i].id).innerHTML = "";
+	};
+}
+
+sendPOSTrequest = function(xmlhttp, address, data){
+	xmlhttp.open("POST",address,true);
+	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xmlhttp.send(data);
+}
+
+
+sendGETrequest = function(xmlhttp, address){
+	xmlhttp.open("GET",address,true);
+	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xmlhttp.send();
+}
+
