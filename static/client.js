@@ -12,29 +12,31 @@ displayview = function(view){
 }
 
 validatesignup = function(){
+	document.getElementById("labelAlertSignup").innerHTML = "";
 	var pass1 = document.getElementById("password1").value;
 	var pass2 = document.getElementById("password2").value;
 	if (pass1 != pass2){
 		document.getElementById("labelAlertSignup").innerHTML = "Passwords do not match";
 	}
 	else{
-		var formData = "";
+		var params = "";
 
-		formData += "email="+document.getElementById("email").value+"&";
-		formData += "password="+document.getElementById("password1").value+"&";
-		formData += "fistname="+document.getElementById("fname").value+"&";
-		formData += "familyname="+document.getElementById("lname").value+"&";
-		formData += "gender="+document.getElementById("gender").value+"&";
-		formData += "city="+document.getElementById("city").value+"&";
-		formData += "country="+document.getElementById("country").value;
-		// var response = serverstub.signUp(formData);
-		alert(formData);
+		params += "email="+document.getElementById("email").value+"&";
+		params += "password="+document.getElementById("password1").value+"&";
+		params += "firstname="+document.getElementById("fname").value+"&";
+		params += "familyname="+document.getElementById("lname").value+"&";
+		params += "gender="+document.getElementById("gender").value+"&";
+		params += "city="+document.getElementById("city").value+"&";
+		params += "country="+document.getElementById("country").value;
 
-		//if(response.success == true){
-		//	document.getElementById("labelAlertSignup").innerHTML = response.message;	
-		//} else {
-		//	document.getElementById("labelAlertSignup").innerHTML = response.message;
-		//}	
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function(){
+	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		    	var response = JSON.parse(xmlhttp.responseText);
+				document.getElementById("labelAlertSignup").innerHTML = response.message;
+	    	}
+		};
+		sendPOSTrequest(xmlhttp, "/signup", params);
 	}
 	return false;
 

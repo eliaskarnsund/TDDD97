@@ -43,7 +43,7 @@ def sign_up():
 		country = request.form['country']
 
 		database_helper.add_user(email, password, firstname, familyname, gender, city, country)
-		return 'added'
+		return json.dumps({'success' : True, 'message' : 'Signup successful'})
 
 @app.route('/signout', methods=['POST'])
 def sign_out():
