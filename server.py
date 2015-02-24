@@ -104,7 +104,7 @@ def get_user_messages_by_token(token=None):
 		return json.dumps({"success": True, "message": "Messages retrieved.", "data": messages})
 	return json.dumps({"success": False, "message": "You are not signed in."})
 
-@app.route('/getusermessagesbyemail/<token>/<email>', methods=['GET'])
+@app.route('/getusermessagesbyemail/<email>/<token>', methods=['GET'])
 def get_user_messagaes_by_email(token=None, email=None):
 	loggedInUser = database_helper.get_logged_in_user(token)
 	userInfo = database_helper.get_user(email)
