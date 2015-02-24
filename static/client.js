@@ -100,7 +100,7 @@ changeView = function(a){
 
     var selected = document.getElementById(a.id + "Content");
     if(a.id=="home"){
-    	setupUser("home");
+    	setupUserInfo("home");
     }
     selected.classList.remove("hide");
     selected.classList.add("show");
@@ -111,9 +111,7 @@ changeView = function(a){
 }
 
 
-setupUser = function(view){
-	
-		// var response = serverstub.getUserDataByEmail(localStorage.getItem("token"), document.getElementById("userId").value);
+setupUserInfo = function(view){
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function(){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
@@ -124,10 +122,10 @@ setupUser = function(view){
 		    		} else {
 		    			setUserInfo("browse",response.data)
 		    		}
-		
 		    	};
 	    	};
 		};
+
 		var token = localStorage.getItem("token");
 		if (view=="home") {
 			sendGETrequest(xmlhttp, "/getuserdatabytoken/"+token);
@@ -168,23 +166,19 @@ postMessageBrowse = function(){
 	};
 	var email = document.getElementById("showEmailbrowse").innerHTML;
 	response2 = serverstub.postMessage(localStorage.getItem("token"), message, email);
-	updateWall2();
+	updateWallBrowse();
 	document.getElementById("messageBrowse").value = "";
 }
 
 updateWall =function(){
 	document.getElementById("messageWallHome").innerHTML ="";
-	// var response = serverstub.getUserMessagesByToken(localStorage.getItem("token"));
 	getUserMessagesByToken(localStorage.getItem("token"));
 	
 }
 
-updateWall2 =function(response){
+updateWallBrowse =function(){
 	document.getElementById("messageWallBrowse").innerHTML ="";
-	// var response = serverstub.getUserMessagesByEmail(localStorage.getItem("token"), document.getElementById("showEmailbrowse").innerHTML);
-	if(response.success){
-		writeWall("Browse", response);
-	}
+	getUserMessagesByEmail(localStorage.getItem("token"),document.getElementById("userId").value);
 }
 
 
@@ -202,9 +196,9 @@ writeWall = function(page, response){
 findUser = function(){
 	document.getElementById("labelAlertFindUser").innerHTML = "";
 	var userId = document.getElementById("userId").value;
-	// var response = serverstub.getUserMessagesByEmail(localStorage.getItem("token"), userId);
 
-	getUserMessagesByEmail(localStorage.getItem("token"), userId);
+	setupUserInfo("browse");
+	updateWallBrowse();
 
 	return false;
 };
@@ -215,7 +209,6 @@ getUserMessagesByToken = function(token){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    	var response = JSON.parse(xmlhttp.responseText);
 		    	if(response.success){
-					//setupUser("browse");
 					if(response.success){
 						writeWall("Home", response);
 					}
@@ -236,8 +229,9 @@ getUserMessagesByEmail = function(token, email){
 					document.getElementById("userInfo2").classList.add("show");
 					document.getElementById("userWall2").classList.remove("hide");
 					document.getElementById("userWall2").classList.add("show");
-					setupUser("browse");
-					updateWall2(response);
+					if(response.success){
+						writeWall("Browse", response);
+					}
 				} else {
 					document.getElementById("labelAlertFindUser").innerHTML = "Could not find user";
 				}	    
