@@ -42,8 +42,11 @@ def sign_up():
 		city = request.form['city']
 		country = request.form['country']
 
-		database_helper.add_user(email, password, firstname, familyname, gender, city, country)
-		return json.dumps({'success' : True, 'message' : 'Signup successful'})
+		if database_helper.get_user(email)==None:
+			database_helper.add_user(email, password, firstname, familyname, gender, city, country)
+			return json.dumps({'success' : True, 'message' : 'Signup successful'})
+		return json.dumps({'success' : False, 'message' : 'User already exist'})
+		
 
 @app.route('/signout', methods=['POST'])
 def sign_out():
