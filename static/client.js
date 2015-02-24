@@ -82,7 +82,17 @@ changePassword = function(){
 }
 
 signOut = function(){
-	var response = serverstub.signOut(localStorage.getItem("token"));
+	var xmlhttp = new XMLHttpRequest();
+	// Onödigt?
+	// xmlhttp.onreadystatechange=function(){
+ 	//  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+	//     	var response = JSON.parse(xmlhttp.responseText);
+	//     	if (response.success) {	    		
+	//     	};
+ 	//    	};
+	// };
+	sendPOSTrequest(xmlhttp,"/signout", "token="+localStorage.getItem("token"));
+
 	localStorage.removeItem("token");
 	displayview("welcomeview");
 	return false;
@@ -145,29 +155,50 @@ setUserInfo = function(view, data){
 	updateWall();
 }
 
-postMessage = function(){
-	var message = document.getElementById("message").value;
-	if (message=="") {
-		return;
-	};
-	var response = serverstub.getUserDataByToken(localStorage.getItem("token"));
-	if(response.success==true){
-		var email = response.data.email;
-		response2 = serverstub.postMessage(localStorage.getItem("token"), message, email);
-		updateWall();
-		document.getElementById("message").value = "";
-	} 
+postMessageHome = function(){
+	postMessage("home");
 }
 
 postMessageBrowse = function(){
-	var message = document.getElementById("messageBrowse").value;
+	postMessage("browse");
+}
+
+postMessage = function(view){
+	var message = ""
+	var email = ""
+	if (view=="home") {
+		message = document.getElementById("message").value;
+		email = document.getElementById("showEmailhome").innerHTML;
+	}else{
+		message = document.getElementById("messageBrowse").value;
+		email = document.getElementById("showEmailbrowse").innerHTML;
+	}
+	
 	if (message=="") {
 		return;
 	};
-	var email = document.getElementById("showEmailbrowse").innerHTML;
-	response2 = serverstub.postMessage(localStorage.getItem("token"), message, email);
-	updateWallBrowse();
-	document.getElementById("messageBrowse").value = "";
+
+	var token = localStorage.getItem("token");
+	params = "token="+token+"&email="+email+"&message="+message;
+
+	var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function(){
+	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		    	var response = JSON.parse(xmlhttp.responseText);
+		    	if (response.success) {
+		    		if (view=="home") {
+		    			updateWall();
+						document.getElementById("message").value = "";
+		    		} else{
+		    			updateWallBrowse();
+						document.getElementById("messageBrowse").value = "";
+					}
+		    	};
+	    	};
+		};
+
+	sendPOSTrequest(xmlhttp, "/postmessage", params);
+
 }
 
 updateWall =function(){
