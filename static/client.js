@@ -215,7 +215,7 @@ updateWallBrowse =function(){
 
 
 writeWall = function(page, response){
-	for (var i = 0; response.data.length - 1 >= i; i++) {
+	for (var i = response.data.length - 1;  i >= 0; i--) {
 		data = response.data[i]
 		// var h = response.data[i].split(",")
 		var message = data[2];
