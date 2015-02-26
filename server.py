@@ -61,16 +61,18 @@ def change_password():
 	token = request.form['token']
 	old_password = request.form['old_password']
 	new_password = request.form['new_password']
-
-	user = database_helper.get_logged_in_user(token)
-	if user != None:
-		email = user[0]
-		current_password = database_helper.get_user(email)[1]
-		if current_password == old_password:
-			database_helper.set_password(email, new_password)
-			return json.dumps({"success": True, "message": "Password changed."})
-		return json.dumps({"success": False, "message": "Wrong password."})
-	return json.dumps({"success": False, "message": "Not logged in."})
+	if len(new_password) < 5:
+		return json.dumps({"success": False, "message": "The password has to be 5 characters or more."})
+	else:
+		user = database_helper.get_logged_in_user(token)
+		if user != None:
+			email = user[0]
+			current_password = database_helper.get_user(email)[1]
+			if current_password == old_password:
+				database_helper.set_password(email, new_password)
+				return json.dumps({"success": True, "message": "Password changed."})
+			return json.dumps({"success": False, "message": "Wrong password."})
+		return json.dumps({"success": False, "message": "Not logged in."})
 
 @app.route('/getuserdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token=None):
