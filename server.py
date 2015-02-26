@@ -1,17 +1,19 @@
 
-from flask import Flask 
+from flask import Flask, url_for
 from flask import app, request, render_template
 import hashlib, uuid
 import database_helper
 import json
 import string, random
+import re
 
-app = Flask(__name__)      
+app = Flask(__name__)
  
 @app.route('/')
 def home():
 	database_helper.get_db()
-	return 'hello sir'
+	#render_template('static/client.html')
+	return render_template('client.html')
 
 @app.route('/signin', methods=['POST'])
 def sign_in():
@@ -19,30 +21,54 @@ def sign_in():
 	password = request.form['password']
 	user = database_helper.get_user(email)
 	if user == None:
-		return 'This user does not exist'
+		return json.dumps({'success' : False, 'message' : 'This user does not exist'})
 	elif verifyPassword(password, user[1]):
 		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
 		if database_helper.get_logged_in_user(token):
-			return 'already logged in'
+			return json.dumps({'success' : False, 'message' : 'Already logged in'})
 		else:
 			database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
-		return 'wrong password'
+		return json.dumps({'success' : False, 'message' : 'Wrong password'})
 
 @app.route('/signup', methods=['POST'])
 def sign_up():
 	if request.method == 'POST':
-		email = request.form['email']
-		password = request.form['password']
-		firstname = request.form['firstname']
-		familyname = request.form['familyname']
-		gender = request.form['gender']
-		city = request.form['city']
-		country = request.form['country']
+		data = {}
+		data['email'] = request.form['email']
+		data['password'] = request.form['password']
+		data['firstname'] = request.form['firstname']
+		data['familyname'] = request.form['familyname']
+		data['gender'] = request.form['gender']
+		data['city'] = request.form['city']
+		data['country'] = request.form['country']
 
-		database_helper.add_user(email, password, firstname, familyname, gender, city, country)
-		return 'added'
+		if not(is_valid_signup(data)):
+			return json.dumps({'success' : False, 'message' : 'Invalid data'})
+
+		if database_helper.get_user(data['email'])==None:
+			database_helper.add_user(data['email'], data['password'], data['firstname'], data['familyname'], data['gender'], data['city'], data['country'])
+			return json.dumps({'success' : True, 'message' : 'Signup successful'})
+		return json.dumps({'success' : False, 'message' : 'User already exist'})
+
+def is_valid_signup(data):
+	if not (re.match("[^@]+@[^@]+\.[^@]+", data['email'])):
+		return False
+	if (len(data['password']) < 5):
+		return False
+	if (len(data['firstname']) == 0 ):
+		return False
+	if (len(data['familyname']) == 0 ):
+		return False
+	if not(data['gender'] == 'Female' or data['gender'] == 'Male'):
+		return False
+	if (len(data['city']) == 0 ):
+		return False
+	if (len(data['country']) == 0 ):
+		return False
+	return True
+		
 
 @app.route('/signout', methods=['POST'])
 def sign_out():
@@ -57,16 +83,18 @@ def change_password():
 	token = request.form['token']
 	old_password = request.form['old_password']
 	new_password = request.form['new_password']
-
-	user = database_helper.get_logged_in_user(token)
-	if user != None:
-		email = user[0]
-		current_password = database_helper.get_user(email)[1]
-		if current_password == old_password:
-			database_helper.set_password(email, new_password)
-			return json.dumps({"success": True, "message": "Password changed."})
-		return json.dumps({"success": False, "message": "Wrong password."})
-	return json.dumps({"success": False, "message": "Not logged in."})
+	if len(new_password) < 5:
+		return json.dumps({"success": False, "message": "The password has to be 5 characters or more."})
+	else:
+		user = database_helper.get_logged_in_user(token)
+		if user != None:
+			email = user[0]
+			current_password = database_helper.get_user(email)[1]
+			if current_password == old_password:
+				database_helper.set_password(email, new_password)
+				return json.dumps({"success": True, "message": "Password changed."})
+			return json.dumps({"success": False, "message": "Wrong password."})
+		return json.dumps({"success": False, "message": "Not logged in."})
 
 @app.route('/getuserdatabytoken/<token>', methods=['GET'])
 def get_user_data_by_token(token=None):
@@ -100,7 +128,7 @@ def get_user_messages_by_token(token=None):
 		return json.dumps({"success": True, "message": "Messages retrieved.", "data": messages})
 	return json.dumps({"success": False, "message": "You are not signed in."})
 
-@app.route('/getusermessagesbyemail/<token>/<email>', methods=['GET'])
+@app.route('/getusermessagesbyemail/<email>/<token>', methods=['GET'])
 def get_user_messagaes_by_email(token=None, email=None):
 	loggedInUser = database_helper.get_logged_in_user(token)
 	userInfo = database_helper.get_user(email)
