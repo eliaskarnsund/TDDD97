@@ -1,6 +1,7 @@
-
 from flask import Flask, url_for
 from flask import app, request, render_template
+from gevent.wsgi import WSGIServer
+from server import app
 import hashlib, uuid
 import database_helper
 import json
@@ -159,5 +160,7 @@ def verifyPassword(password, databasePass):
 
 if __name__ == '__main__':
 	# database_helper.init_db(app)
-	app.debug = True
-	app.run(host = '0.0.0.0', port = 5000)
+	# app.debug = True
+	# app.run(host = '0.0.0.0', port = 5000)
+	http_server = WSGIServer(('', 5000), app)
+	http_server.serve_forever()
