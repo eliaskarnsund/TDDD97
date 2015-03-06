@@ -31,8 +31,11 @@ def sign_in():
 		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
 		if database_helper.get_logged_in_user(token):
 			return json.dumps({'success' : False, 'message' : 'Already logged in'})
-		else:
-			database_helper.add_logged_in_user(email, token)
+		elif database_helper.get_logged_in_user_by_email(email):
+			# remove other token if signed in again
+			database_helper.remove_logged_in_user_by_email(email)
+		# add token to database
+		database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
 		return json.dumps({'success' : False, 'message' : 'Wrong password'})
@@ -168,27 +171,43 @@ def web_socket():
 	if request.environ.get('wsgi.websocket'):
 
 		ws = request.environ['wsgi.websocket']
-		data = json.loads(ws.receive())
 
-		#den her rade fuckar ibland
-		#if data['email'] in active_sockets:
-			# sign out the other user
-		#	print 'already active'
-			#active_sockets[data['email']].send("FUCK YOU")
-		#else:
+		obj = ws.receive()
+		data = json.loads(obj)
+
+		print type(obj)
+		print type(data)
+		print type(data['email'])
+		try:
+			#den her rade fuckar ibland
+			if data['email'] in active_sockets:
+				# sign out the other user
+				print '---'+ data['email'] + ' already has active socket'
+
+				#database_helper.remove_logged_in_user(data['token'])
+				# active_sockets[data['email']].send("FUCK YOU")
+				ws.send('Message from server --- 2')
+
+
 			# save active websocket for logged in email
 			# den her med
-		#	active_sockets[data['email']] = ws
-		
-		# print '_______' + active_sockets
-		# try catch?
+			print '---setting socket for ' + data['email']
+			active_sockets[data['email']] = ws
+			
+			# print '_______' + active_sockets
+			# try catch?
 
-		# detta skickas va
-		ws.send('Message from server')
+			# detta skickas va
+			ws.send('Message from server')
 
-		# listen on socket
-		#while True:
-		#	pass
+			# listen on socket
+			#while True:
+			#	pass
+		except WebSocketError as e:
+			repr(e)
+			print "---WebSocketError lol"
+			del active_sockets[data['email']]
+
 			
 	return 'OK'
 

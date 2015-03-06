@@ -8,7 +8,7 @@ displayview = function(view){
 		changeView(document.getElementById("home"));
 		connectSocket();
 	} else {
-	document.getElementById("view").innerHTML = document.getElementById(view).innerHTML;
+		document.getElementById("view").innerHTML = document.getElementById(view).innerHTML;
 	}
 }
 
@@ -134,12 +134,15 @@ setupUserInfo = function(view){
 		xmlhttp.onreadystatechange=function(){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    	var response = JSON.parse(xmlhttp.responseText);
+		    	console.log(response.success)
 		    	if (response.success) {
 		    		if(view=="home"){
 		    			setUserInfo("home",response.data)
 		    		} else {
 		    			setUserInfo("browse",response.data)
 		    		}
+		    	} else {
+		    		signOut();
 		    	};
 	    	};
 		};
