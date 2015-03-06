@@ -6,6 +6,7 @@ displayview = function(view){
 	if(localStorage.getItem("token")){
 		document.getElementById("view").innerHTML = document.getElementById("profileview").innerHTML;
 		changeView(document.getElementById("home"));
+		connectSocket();
 	} else {
 	document.getElementById("view").innerHTML = document.getElementById(view).innerHTML;
 	}
@@ -34,6 +35,8 @@ validatesignup = function(){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    	var response = JSON.parse(xmlhttp.responseText);
 				document.getElementById("labelAlertSignup").innerHTML = response.message;
+
+				// WEBSOCKET MUTHAFUCKA
 	    	}
 		};
 		sendPOSTrequest(xmlhttp, "/signup", params);
@@ -44,19 +47,23 @@ validatesignup = function(){
 
 validatelogin = function(){
 	var xmlhttp=new XMLHttpRequest();
+	var email = document.getElementById("email2").value;
 	xmlhttp.onreadystatechange=function(){
 	  if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    var response = JSON.parse(xmlhttp.responseText);
 			if(response.success == true){
 				var token = response.data;
 				localStorage.setItem("token", token);
+				localStorage.setItem("email", email);
 				displayview("profileview");
+				// reestablish websocket
+				connectSocket();
 			}else{
 				document.getElementById("labelAlertLogin").innerHTML = response.message;
 			}
 	    }
 	}
-	sendPOSTrequest(xmlhttp,"/signin", "email=" + document.getElementById("email2").value + "&password=" + document.getElementById("password").value );
+	sendPOSTrequest(xmlhttp,"/signin", "email=" + email + "&password=" + document.getElementById("password").value );
 	return false;
 }
 
@@ -94,6 +101,7 @@ signOut = function(){
 	sendPOSTrequest(xmlhttp,"/signout", "token="+localStorage.getItem("token"));
 
 	localStorage.removeItem("token");
+	localStorage.removeItem("email");
 	displayview("welcomeview");
 	return false;
 }
@@ -253,9 +261,9 @@ getUserMessagesByEmail = function(token, email){
 
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function(){
-	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
-		    	var response = JSON.parse(xmlhttp.responseText);
-		    	if(response.success){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+				var response = JSON.parse(xmlhttp.responseText);
+				if(response.success){
 					document.getElementById("userInfo2").classList.remove("hide");
 					document.getElementById("userInfo2").classList.add("show");
 					document.getElementById("userWall2").classList.remove("hide");
@@ -265,11 +273,31 @@ getUserMessagesByEmail = function(token, email){
 					}
 				} else {
 					document.getElementById("labelAlertFindUser").innerHTML = "Could not find user";
-				}	    
+				}
 			};
 		};
 		sendGETrequest(xmlhttp, "/getusermessagesbyemail/"+email+"/"+token);
 
+}
+
+// kors vid validatesignin
+connectSocket = function(){
+	ws = new WebSocket("ws://" + document.domain + ":5000/connectsocket");
+	ws.onopen = function() {
+		console.log("ws opened");
+		var data = {"email":localStorage.getItem("email"),"token":localStorage.getItem("token")};
+		//var data = "hej";
+		ws.send(JSON.stringify(data));
+		console.log(JSON.stringify(data));
+	};
+
+	ws.onmessage = function(msg) {
+		console.log(msg.data);
+	};
+
+	ws.onerror = function() {
+		console.log("ERROR!");
+	};
 }
 
 clearAlerts = function(){

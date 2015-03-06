@@ -1,6 +1,8 @@
 from flask import Flask, url_for
 from flask import app, request, render_template
-from gevent.wsgi import WSGIServer
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
+from geventwebsocket import WebSocketError
 from server import app
 import hashlib, uuid
 import database_helper
@@ -9,6 +11,8 @@ import string, random
 import re
 
 app = Flask(__name__)
+
+active_sockets = dict()
  
 @app.route('/')
 def home():
@@ -158,9 +162,39 @@ def verifyPassword(password, databasePass):
 	#reHashed = hashPassword(password)
 	return password == databasePass
 
+@app.route('/connectsocket')
+def web_socket():
+
+	if request.environ.get('wsgi.websocket'):
+
+		ws = request.environ['wsgi.websocket']
+		data = json.loads(ws.receive())
+
+		#den her rade fuckar ibland
+		#if data['email'] in active_sockets:
+			# sign out the other user
+		#	print 'already active'
+			#active_sockets[data['email']].send("FUCK YOU")
+		#else:
+			# save active websocket for logged in email
+			# den her med
+		#	active_sockets[data['email']] = ws
+		
+		# print '_______' + active_sockets
+		# try catch?
+
+		# detta skickas va
+		ws.send('Message from server')
+
+		# listen on socket
+		#while True:
+		#	pass
+			
+	return 'OK'
+
 if __name__ == '__main__':
 	# database_helper.init_db(app)
-	# app.debug = True
+	app.debug = True
 	# app.run(host = '0.0.0.0', port = 5000)
-	http_server = WSGIServer(('', 5000), app)
+	http_server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
 	http_server.serve_forever()
