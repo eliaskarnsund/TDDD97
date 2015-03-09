@@ -6,7 +6,7 @@ displayview = function(view){
 	if(localStorage.getItem("token")){
 		document.getElementById("view").innerHTML = document.getElementById("profileview").innerHTML;
 		changeView(document.getElementById("home"));
-		connectSocket();
+		// connectSocket();
 	} else {
 		document.getElementById("view").innerHTML = document.getElementById(view).innerHTML;
 	}
@@ -134,7 +134,7 @@ setupUserInfo = function(view){
 		xmlhttp.onreadystatechange=function(){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    	var response = JSON.parse(xmlhttp.responseText);
-		    	console.log(response.success)
+		    	console.log("setupUserinfo response.succes="+response.success)
 		    	if (response.success) {
 		    		if(view=="home"){
 		    			setUserInfo("home",response.data)
@@ -289,13 +289,21 @@ connectSocket = function(){
 	ws.onopen = function() {
 		console.log("ws opened");
 		var data = {"email":localStorage.getItem("email"),"token":localStorage.getItem("token")};
-		//var data = "hej";
 		ws.send(JSON.stringify(data));
 		console.log(JSON.stringify(data));
 	};
 
 	ws.onmessage = function(msg) {
 		console.log(msg.data);
+		message = JSON.parse(msg.data);
+		if (message.success == false) {
+			console.log(message.message);
+			signOut();
+		}
+	};
+
+	ws.onclose = function() {
+		console.log("WebSocket closed");
 	};
 
 	ws.onerror = function() {

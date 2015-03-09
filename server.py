@@ -17,6 +17,7 @@ active_sockets = dict()
 @app.route('/')
 def home():
 	database_helper.get_db()
+	# active_sockets.clear()
 	#render_template('static/client.html')
 	return render_template('client.html')
 
@@ -33,6 +34,17 @@ def sign_in():
 			return json.dumps({'success' : False, 'message' : 'Already logged in'})
 		elif database_helper.get_logged_in_user_by_email(email):
 			# remove other token if signed in again
+			if email in active_sockets:
+				print 'active sockets: '+ str(len(active_sockets))
+				try:
+					ws = active_sockets[email]
+					# 
+					ws.send(json.dumps({'success' : False, 'message' : 'You have been logged out'}))
+				except WebSocketError as e:
+					repr(e)
+					print "WebSocketError"
+					# websocket already closed
+					del active_sockets[email]
 			database_helper.remove_logged_in_user_by_email(email)
 		# add token to database
 		database_helper.add_logged_in_user(email, token)
@@ -178,31 +190,34 @@ def web_socket():
 		print type(obj)
 		print type(data)
 		print type(data['email'])
+
+		# check if logged in? 
+		# sending token?
+		# check in database
+		# if already in active sockets then it must be a page refresh
 		try:
-			#den her rade fuckar ibland
+
+			# if this is true 
 			if data['email'] in active_sockets:
-				# sign out the other user
 				print '---'+ data['email'] + ' already has active socket'
 
 				#database_helper.remove_logged_in_user(data['token'])
-				# active_sockets[data['email']].send("FUCK YOU")
-				ws.send('Message from server --- 2')
+
+				# ws.send('Message from server --- 2')
 
 
 			# save active websocket for logged in email
 			# den her med
 			print '---setting socket for ' + data['email']
 			active_sockets[data['email']] = ws
-			
-			# print '_______' + active_sockets
-			# try catch?
-
-			# detta skickas va
-			ws.send('Message from server')
 
 			# listen on socket
-			#while True:
-			#	pass
+			# needed to keep socket open
+			while True:
+				obj = ws.receive()
+				ws.send('Message from server')
+				pass
+
 		except WebSocketError as e:
 			repr(e)
 			print "---WebSocketError lol"
