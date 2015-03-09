@@ -6,7 +6,9 @@ displayview = function(view){
 	if(localStorage.getItem("token")){
 		document.getElementById("view").innerHTML = document.getElementById("profileview").innerHTML;
 		changeView(document.getElementById("home"));
-		// connectSocket();
+
+		// reestablish websocket
+		connectSocket();
 	} else {
 		document.getElementById("view").innerHTML = document.getElementById(view).innerHTML;
 	}
@@ -35,8 +37,6 @@ validatesignup = function(){
 	  		if (xmlhttp.readyState==4 && xmlhttp.status==200){
 		    	var response = JSON.parse(xmlhttp.responseText);
 				document.getElementById("labelAlertSignup").innerHTML = response.message;
-
-				// WEBSOCKET MUTHAFUCKA
 	    	}
 		};
 		sendPOSTrequest(xmlhttp, "/signup", params);
@@ -56,7 +56,7 @@ validatelogin = function(){
 				localStorage.setItem("token", token);
 				localStorage.setItem("email", email);
 				displayview("profileview");
-				// reestablish websocket
+				// establish websocket
 				connectSocket();
 			}else{
 				document.getElementById("labelAlertLogin").innerHTML = response.message;

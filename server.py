@@ -17,7 +17,7 @@ active_sockets = dict()
 @app.route('/')
 def home():
 	database_helper.get_db()
-	# active_sockets.clear()
+
 	#render_template('static/client.html')
 	return render_template('client.html')
 
@@ -35,14 +35,12 @@ def sign_in():
 		elif database_helper.get_logged_in_user_by_email(email):
 			# remove other token if signed in again
 			if email in active_sockets:
-				print 'active sockets: '+ str(len(active_sockets))
 				try:
-					ws = active_sockets[email]
-					# 
+					ws = active_sockets[email] 
 					ws.send(json.dumps({'success' : False, 'message' : 'You have been logged out'}))
 				except WebSocketError as e:
 					repr(e)
-					print "WebSocketError"
+					print "WebSocketError on logout"
 					# websocket already closed
 					del active_sockets[email]
 			database_helper.remove_logged_in_user_by_email(email)
@@ -183,48 +181,40 @@ def web_socket():
 	if request.environ.get('wsgi.websocket'):
 
 		ws = request.environ['wsgi.websocket']
-
 		obj = ws.receive()
 		data = json.loads(obj)
 
-		print type(obj)
-		print type(data)
-		print type(data['email'])
+		# check if logged in
+		if not database_helper.get_logged_in_user(data['token']):
+			ws.send(json.dumps({"success": False, "message": "You are not signed in."}))
 
-		# check if logged in? 
-		# sending token?
-		# check in database
-		# if already in active sockets then it must be a page refresh
 		try:
 
-			# if this is true 
+			# if already in active sockets then it must be a page refresh
 			if data['email'] in active_sockets:
-				print '---'+ data['email'] + ' already has active socket'
-
-				#database_helper.remove_logged_in_user(data['token'])
-
-				# ws.send('Message from server --- 2')
-
+				print data['email'] + ' already has active socket'
 
 			# save active websocket for logged in email
-			# den her med
-			print '---setting socket for ' + data['email']
+			print 'Setting socket for: ' + data['email']
 			active_sockets[data['email']] = ws
 
 			# listen on socket
 			# needed to keep socket open
 			while True:
 				obj = ws.receive()
-				ws.send('Message from server')
-				pass
+				if obj == None:
+					del active_sockets[data['email']]
+					ws.close()
+					print 'Socket closed: ' + data['email']
+					return ''
+
 
 		except WebSocketError as e:
 			repr(e)
-			print "---WebSocketError lol"
+			print "WebSocketError"
 			del active_sockets[data['email']]
-
 			
-	return 'OK'
+	return ''
 
 if __name__ == '__main__':
 	# database_helper.init_db(app)
