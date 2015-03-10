@@ -1,5 +1,6 @@
 from flask import Flask, url_for
 from flask import app, request, render_template
+from flask.ext.bcrypt import Bcrypt
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 from geventwebsocket import WebSocketError
@@ -28,7 +29,7 @@ def sign_in():
 	user = database_helper.get_user(email)
 	if user == None:
 		return json.dumps({'success' : False, 'message' : 'This user does not exist'})
-	elif verifyPassword(password, user[1]):
+	elif bcrypt.check_password_hash(user[1], password):
 		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
 		if database_helper.get_logged_in_user(token):
 			return json.dumps({'success' : False, 'message' : 'Already logged in'})
@@ -66,7 +67,7 @@ def sign_up():
 			return json.dumps({'success' : False, 'message' : 'Invalid data'})
 
 		if database_helper.get_user(data['email'])==None:
-			database_helper.add_user(data['email'], data['password'], data['firstname'], data['familyname'], data['gender'], data['city'], data['country'])
+			database_helper.add_user(data['email'], bcrypt.generate_password_hash(data['password']), data['firstname'], data['familyname'], data['gender'], data['city'], data['country'])
 			return json.dumps({'success' : True, 'message' : 'Signup successful'})
 		return json.dumps({'success' : False, 'message' : 'User already exist'})
 
@@ -108,8 +109,8 @@ def change_password():
 		if user != None:
 			email = user[0]
 			current_password = database_helper.get_user(email)[1]
-			if current_password == old_password:
-				database_helper.set_password(email, new_password)
+			if bcrypt.check_password_hash(current_password, old_password):
+				database_helper.set_password(email, bcrypt.generate_password_hash(new_password))
 				return json.dumps({"success": True, "message": "Password changed."})
 			return json.dumps({"success": False, "message": "Wrong password."})
 		return json.dumps({"success": False, "message": "Not logged in."})
@@ -166,15 +167,6 @@ def post_message():
 		return json.dumps({"success": True, "message": "Message posted"})
 	return json.dumps({"success": False, "message": "Message not posted"})
 
-def hashPassword(password):
-	salt = uuid.uuid4().hex
-	hashedPassword = hashlib.sha512(password + salt).hexdigest()
-	return hashedPass
-
-def verifyPassword(password, databasePass):
-	#reHashed = hashPassword(password)
-	return password == databasePass
-
 @app.route('/connectsocket')
 def web_socket():
 
@@ -219,6 +211,7 @@ def web_socket():
 if __name__ == '__main__':
 	# database_helper.init_db(app)
 	app.debug = True
+	bcrypt = Bcrypt(app)
 	# app.run(host = '0.0.0.0', port = 5000)
 	http_server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
 	http_server.serve_forever()
