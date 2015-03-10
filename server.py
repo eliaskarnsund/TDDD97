@@ -1,6 +1,8 @@
 from flask import Flask, url_for
 from flask import app, request, render_template
-from gevent.wsgi import WSGIServer
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
+from geventwebsocket import WebSocketError
 from server import app
 import hashlib, uuid
 import database_helper
@@ -9,10 +11,13 @@ import string, random
 import re
 
 app = Flask(__name__)
+
+active_sockets = dict()
  
 @app.route('/')
 def home():
 	database_helper.get_db()
+
 	#render_template('static/client.html')
 	return render_template('client.html')
 
@@ -27,8 +32,20 @@ def sign_in():
 		token =''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(30));
 		if database_helper.get_logged_in_user(token):
 			return json.dumps({'success' : False, 'message' : 'Already logged in'})
-		else:
-			database_helper.add_logged_in_user(email, token)
+		elif database_helper.get_logged_in_user_by_email(email):
+			# remove other token if signed in again
+			if email in active_sockets:
+				try:
+					ws = active_sockets[email] 
+					ws.send(json.dumps({'success' : False, 'message' : 'You have been logged out'}))
+				except WebSocketError as e:
+					repr(e)
+					print "WebSocketError on logout"
+					# websocket already closed
+					del active_sockets[email]
+			database_helper.remove_logged_in_user_by_email(email)
+		# add token to database
+		database_helper.add_logged_in_user(email, token)
 		return json.dumps({'success' : True, 'message' : 'you have logged in', 'data' : token})
 	else:
 		return json.dumps({'success' : False, 'message' : 'Wrong password'})
@@ -158,9 +175,50 @@ def verifyPassword(password, databasePass):
 	#reHashed = hashPassword(password)
 	return password == databasePass
 
+@app.route('/connectsocket')
+def web_socket():
+
+	if request.environ.get('wsgi.websocket'):
+
+		ws = request.environ['wsgi.websocket']
+		obj = ws.receive()
+		data = json.loads(obj)
+
+		# check if logged in
+		if not database_helper.get_logged_in_user(data['token']):
+			ws.send(json.dumps({"success": False, "message": "You are not signed in."}))
+
+		try:
+
+			# if already in active sockets then it must be a page refresh
+			if data['email'] in active_sockets:
+				print data['email'] + ' already has active socket'
+
+			# save active websocket for logged in email
+			print 'Setting socket for: ' + data['email']
+			active_sockets[data['email']] = ws
+
+			# listen on socket
+			# needed to keep socket open
+			while True:
+				obj = ws.receive()
+				if obj == None:
+					del active_sockets[data['email']]
+					ws.close()
+					print 'Socket closed: ' + data['email']
+					return ''
+
+
+		except WebSocketError as e:
+			repr(e)
+			print "WebSocketError"
+			del active_sockets[data['email']]
+			
+	return ''
+
 if __name__ == '__main__':
 	# database_helper.init_db(app)
-	# app.debug = True
+	app.debug = True
 	# app.run(host = '0.0.0.0', port = 5000)
-	http_server = WSGIServer(('', 5000), app)
+	http_server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
 	http_server.serve_forever()

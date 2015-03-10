@@ -50,6 +50,10 @@ def get_logged_in_user(token):
 	userInfo = query_db('SELECT * FROM loggedInUsers AS U WHERE U.token = ?', [token], True)
 	return userInfo
 
+def get_logged_in_user_by_email(email):
+	userInfo = query_db('SELECT * FROM loggedInUsers AS U WHERE U.email = ?', [email], True)
+	return userInfo
+
 def add_logged_in_user(email, token):
 	query_db('INSERT INTO loggedInUsers VALUES (?,?)', [email, token])
 	return
@@ -67,4 +71,8 @@ def set_password(email ,new_password):
 
 def remove_logged_in_user(token):
 	query_db('DELETE FROM loggedInUsers WHERE token = ?', [token])
+	return
+
+def remove_logged_in_user_by_email(email):
+	query_db('DELETE FROM loggedInUsers WHERE email = ?', [email])
 	return
