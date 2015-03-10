@@ -1,6 +1,7 @@
 # TDDD97
 
-# Dependencies 
+## Dependencies 
 flask
 greenlet
 gevent
+gevent-websocket
