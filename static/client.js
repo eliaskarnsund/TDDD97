@@ -298,7 +298,13 @@ getUserMessagesByEmail = function(token, email){
 				}
 			};
 		};
-		sendGETrequest(xmlhttp, "/getusermessagesbyemail/"+email+"/"+token);
+
+		var clientEmail = localStorage.getItem("email");
+		url = "/getusermessagesbyemail/"+email+"/"+clientEmail;
+
+		hashedData= CryptoJS.SHA256(url+"/"+token);
+
+		sendGETrequest(xmlhttp, url+"/"+hashedData);
 
 }
 
