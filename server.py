@@ -115,37 +115,82 @@ def change_password():
 			return json.dumps({"success": False, "message": "Wrong password."})
 		return json.dumps({"success": False, "message": "Not logged in."})
 
-@app.route('/getuserdatabytoken/<token>', methods=['GET'])
-def get_user_data_by_token(token=None):
-	userInfo = database_helper.get_logged_in_user(token)
-	if userInfo is None:
-		return json.dumps({"success": False, "message": "You are not signed in."})
-	else:
-		email = userInfo[0]
-		return get_user_data(email)
+@app.route('/getuserdatabytoken/<clientEmail>/<hashedClientData>', methods=['GET'])
+def get_user_data_by_token(clientEmail=None, hashedClientData=None):
 
-@app.route('/getuserdatabyemail/<email>/<token>', methods=['GET'])
-def get_user_data_by_email(email=None, token=None):
-	if database_helper.get_logged_in_user(token) is None:
-		return json.dumps({"success": False, "message": "You are not signed in."})
+	if verifyToken(hashedClientData, 'getuserdatabytoken', clientEmail):
+		return get_user_data(clientEmail)
 	else:
+		return json.dumps({"success": False, "message": "You are not signed in."})
+
+
+	#userInfo = database_helper.get_logged_in_user(token)
+	#if userInfo is None:
+	#	return json.dumps({"success": False, "message": "You are not signed in."})
+	#else:
+	#	email = userInfo[0]
+	#	return get_user_data(email)
+
+@app.route('/getuserdatabyemail/<email>/<clientEmail>/<hashedClientData>', methods=['GET'])
+def get_user_data_by_email(email=None, clientEmail=None, hashedClientData=None):
+	print '------------------------------'
+	print email
+	print clientEmail
+	print hashedClientData
+	print verifyToken(hashedClientData, 'getuserdatabyemail/'+email, clientEmail)
+	print '------------------------------'
+
+	if verifyToken(hashedClientData, 'getuserdatabyemail/'+email, clientEmail):
 		return get_user_data(email)
+	else:
+		return json.dumps({"success": False, "message": "You are not signed in."})
+
+	#if database_helper.get_logged_in_user(token) is None:
+	#	return json.dumps({"success": False, "message": "You are not signed in."})
+	#else:
+	#	return get_user_data(email)
 
 def get_user_data(email):
 	userInfo = database_helper.get_user(email)
 	if userInfo is None:
+		print '--------- Finns inte' 
 		return json.dumps({"success": False, "message": "No such user."})
 	else:
 		user=[userInfo[0],userInfo[2], userInfo[3], userInfo[4], userInfo[5], userInfo[6]]
+		print '--------- Finns' 
 		return json.dumps({"success": True, "message": "User data retrieved.", "data": user})
 
-@app.route('/getusermessagesbytoken/<token>', methods=['GET'])
-def get_user_messages_by_token(token=None):
-	userInfo = database_helper.get_logged_in_user(token)
-	if userInfo != None:
-		messages = database_helper.get_user_messages(userInfo[0])
+@app.route('/getusermessagesbytoken/<clientEmail>/<hashedData>', methods=['GET'])
+def get_user_messages_by_token(clientEmail=None, hashedData=None):
+
+	if verifyToken(hashedData, 'getusermessagesbytoken', clientEmail):
+		messages = database_helper.get_user_messages(clientEmail)
 		return json.dumps({"success": True, "message": "Messages retrieved.", "data": messages})
 	return json.dumps({"success": False, "message": "You are not signed in."})
+
+
+def verifyToken(hashedClientData, route, clientEmail):
+
+	userData = database_helper.get_logged_in_user_by_email(clientEmail)
+
+	if userData == None:
+		return json.dumps({"success": False, "message": "You are not signed in."})
+
+	# step 7
+	serverToken = userData[1]
+
+	# step 8
+	dataToHash = '/'+route+'/'+clientEmail+'/'+serverToken
+	# encode string to bytes when hashing
+	server_hash = hashlib.sha256(dataToHash.encode()).hexdigest()
+
+	print 'Hash from client: ' + server_hash
+	print 'Hash from server: ' + hashedClientData
+
+	return hashedClientData == server_hash
+
+
+
 
 @app.route('/getusermessagesbyemail/<email>/<token>', methods=['GET'])
 def get_user_messagaes_by_email(token=None, email=None):

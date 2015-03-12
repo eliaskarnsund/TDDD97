@@ -142,18 +142,31 @@ setupUserInfo = function(view){
 		    			setUserInfo("browse",response.data)
 		    		}
 		    	} else {
-		    		signOut();
-		    	};
+					document.getElementById("labelAlertFindUser").innerHTML = "Could not find user";
+					setUserInfo("browse", "")
+				};
 	    	};
 		};
 
+
+		// /getuserdatabyemail/<email>/<clientEmail>/<hashedClientData>
+
+		var clientEmail = localStorage.getItem("email");
+
 		var token = localStorage.getItem("token");
+		var url = "";
+		var hashedData = "";
+
 		if (view=="home") {
-			sendGETrequest(xmlhttp, "/getuserdatabytoken/"+token);
+			url = "/getuserdatabytoken/"+clientEmail;
+			hashedData = CryptoJS.SHA256(url + "/" +token);
 		} else {
 			var email = document.getElementById("userId").value;
-			sendGETrequest(xmlhttp, "/getuserdatabyemail/"+email+"/"+token);
+			url = "/getuserdatabyemail/"+email+"/"+clientEmail;
+			hashedData = CryptoJS.SHA256(url + "/" +token);
 		}
+
+		sendGETrequest(xmlhttp, url+"/"+hashedData);
 }
 
 setUserInfo = function(view, data){
@@ -257,7 +270,13 @@ getUserMessagesByToken = function(token){
 				}    
 			};
 		};
-		sendGETrequest(xmlhttp, "/getusermessagesbytoken/"+token);
+		var email = localStorage.getItem("email");
+		// step 1
+		data = "/getusermessagesbytoken/"+email+"/"+token;
+		// step 2
+		hashedData= CryptoJS.SHA256(data);
+		// step 3 
+		sendGETrequest(xmlhttp, "/getusermessagesbytoken/"+email+"/"+hashedData);
 }
 
 getUserMessagesByEmail = function(token, email){
