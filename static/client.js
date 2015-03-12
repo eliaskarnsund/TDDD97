@@ -72,18 +72,29 @@ changePassword = function(){
 	var pass2 = document.getElementById("changePass2").value;
 	if (pass1 != pass2){
 		document.getElementById("labelAlertChangePw").innerHTML = "Passwords do not match";
+		console.log("---------------f---");
 	} else{
+		
 		var xmlhttp=new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function(){
 		 	if (xmlhttp.readyState==4 && xmlhttp.status==200){
 			    var response = JSON.parse(xmlhttp.responseText);
+			    console.log(response.message)
 				document.getElementById("labelAlertChangePw").innerHTML = response.message;
 				document.getElementById("changePass1").value = "";
 				document.getElementById("changePass2").value = "";
 				document.getElementById("currentPass").value = "";
 		    }
 		}
-		sendPOSTrequest(xmlhttp,"/changepassword", "token=" + localStorage.getItem("token") + "&old_password=" + document.getElementById("currentPass").value + "&new_password="+ pass1 );
+
+		var params = "old_password=" + document.getElementById("currentPass").value;
+		params += "&new_password="+ pass1;
+		params += "&clientEmail="+localStorage.getItem("email");
+		var hashedData = CryptoJS.SHA256("/changepassword" + params + localStorage.getItem("token"));
+		params += "&hashedClientData=" + hashedData
+
+		sendPOSTrequest(xmlhttp,"/changepassword", params);
+		console.log(params);
 	}
 	return false;
 }

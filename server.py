@@ -99,18 +99,19 @@ def sign_out():
 
 @app.route('/changepassword', methods=['POST'])
 def change_password():
-	token = request.form['token']
+	clientEmail = request.form['clientEmail']
 	old_password = request.form['old_password']
 	new_password = request.form['new_password']
 	if len(new_password) < 5:
 		return json.dumps({"success": False, "message": "The password has to be 5 characters or more."})
 	else:
-		user = database_helper.get_logged_in_user(token)
+		verifyTokenPOST('changepassword', request)
+
+		user = database_helper.get_logged_in_user_by_email(clientEmail)
 		if user != None:
-			email = user[0]
-			current_password = database_helper.get_user(email)[1]
+			current_password = database_helper.get_user(clientEmail)[1]
 			if bcrypt.check_password_hash(current_password, old_password):
-				database_helper.set_password(email, bcrypt.generate_password_hash(new_password))
+				database_helper.set_password(clientEmail, bcrypt.generate_password_hash(new_password))
 				return json.dumps({"success": True, "message": "Password changed."})
 			return json.dumps({"success": False, "message": "Wrong password."})
 		return json.dumps({"success": False, "message": "Not logged in."})
@@ -241,6 +242,26 @@ def verifyToken(route, clientEmail, hashedClientData):
 	print 'Hash from server: ' + hashedClientData
 
 	return hashedClientData == server_hash
+
+class Namespace: pass
+def	verifyTokenPOST(route, request):
+	route += route
+	ns = Namespace()
+	ns.clientEmail = ''
+	ns.hashedClientData = ''
+
+	for key in request.form:
+		if key == "clientEmail":
+			ns.clientEmail = request.form[key]
+		elif key == "hashedClientData":
+			ns.hashedClientData = request.form[key]
+		else:
+			route += key +'='+request.form[key]+'&'
+
+		# removes the last & 
+		route = route[:-1]
+
+		return verifyToken(route, ns.clientEmail, ns.hashedClientData)
 
 if __name__ == '__main__':
 	# database_helper.init_db(app)
