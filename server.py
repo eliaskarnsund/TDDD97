@@ -104,17 +104,15 @@ def change_password():
 	new_password = request.form['new_password']
 	if len(new_password) < 5:
 		return json.dumps({"success": False, "message": "The password has to be 5 characters or more."})
-	else:
-		verifyTokenPOST('changepassword', request)
+	if verifyTokenPOST('changepassword', request):
+		current_password = database_helper.get_user(clientEmail)[1]
+		if bcrypt.check_password_hash(current_password, old_password):
+			database_helper.set_password(clientEmail, bcrypt.generate_password_hash(new_password))
+			return json.dumps({"success": True, "message": "Password changed."})
+		return json.dumps({"success": False, "message": "Wrong password."})
+	return json.dumps({"success": False, "message": "You are not signed in."})
 
-		user = database_helper.get_logged_in_user_by_email(clientEmail)
-		if user != None:
-			current_password = database_helper.get_user(clientEmail)[1]
-			if bcrypt.check_password_hash(current_password, old_password):
-				database_helper.set_password(clientEmail, bcrypt.generate_password_hash(new_password))
-				return json.dumps({"success": True, "message": "Password changed."})
-			return json.dumps({"success": False, "message": "Wrong password."})
-		return json.dumps({"success": False, "message": "Not logged in."})
+
 
 @app.route('/getuserdatabytoken/<clientEmail>/<hashedClientData>', methods=['GET'])
 def get_user_data_by_token(clientEmail=None, hashedClientData=None):
@@ -135,11 +133,9 @@ def get_user_data_by_email(email=None, clientEmail=None, hashedClientData=None):
 def get_user_data(email):
 	userInfo = database_helper.get_user(email)
 	if userInfo is None:
-		print '--------- Finns inte' 
 		return json.dumps({"success": False, "message": "No such user."})
 	else:
 		user=[userInfo[0],userInfo[2], userInfo[3], userInfo[4], userInfo[5], userInfo[6]]
-		print '--------- Finns' 
 		return json.dumps({"success": True, "message": "User data retrieved.", "data": user})
 
 @app.route('/getusermessagesbytoken/<clientEmail>/<hashedClientData>', methods=['GET'])
@@ -162,22 +158,10 @@ def get_user_messagaes_by_email(email=None, clientEmail=None, hashedClientData=N
 	else:
 		return json.dumps({"success": False, "message": "You are not signed in."})
 
-
-	#loggedInUser = database_helper.get_logged_in_user(token)
-	#userInfo = database_helper.get_user(email)
-	#if loggedInUser != None:
-	#	messages = database_helper.get_user_messages(email)
-	#	if userInfo != None:
-	#		return json.dumps({"success": True, "message": "Messages retrieved.", "data": messages})
-	#	return json.dumps({"success": False, "message": "Could not find user."})
-	#return json.dumps({"success": False, "message": "You are not signed in."})
-
 @app.route('/postmessage', methods=['POST'])
 def post_message():
-	fromUser = database_helper.get_logged_in_user(request.form['token'])
-	toUser = database_helper.get_user(request.form['email'])
-	if fromUser != None and toUser != None:
-		database_helper.add_user_message(toUser[0], fromUser[0], request.form['message'])
+	if verifyTokenPOST('postmessage', request):
+		database_helper.add_user_message(request.form['email'], request.form['clientEmail'], request.form['message'])
 		return json.dumps({"success": True, "message": "Message posted"})
 	return json.dumps({"success": False, "message": "Message not posted"})
 
@@ -223,7 +207,7 @@ def web_socket():
 	return ''
 
 # route should include all parameters except clientEmail and hashedClientData
-def verifyToken(route, clientEmail, hashedClientData):
+def verifyToken(route, clientEmail, hashedClientData, post=False):
 
 	userData = database_helper.get_logged_in_user_by_email(clientEmail)
 
@@ -234,34 +218,41 @@ def verifyToken(route, clientEmail, hashedClientData):
 	serverToken = userData[1]
 
 	# step 8
-	dataToHash = '/'+route+'/'+clientEmail+'/'+serverToken
+	if post:
+		dataToHash = '/'+route+"&clientEmail="+clientEmail+'&token='+serverToken
+	else:
+		dataToHash = '/'+route+'/'+clientEmail+'/'+serverToken
+
 	# encode string to bytes when hashing
 	server_hash = hashlib.sha256(dataToHash.encode()).hexdigest()
 
+	print 'dataToHash: ' + dataToHash
 	print 'Hash from client: ' + server_hash
 	print 'Hash from server: ' + hashedClientData
 
 	return hashedClientData == server_hash
 
-class Namespace: pass
 def	verifyTokenPOST(route, request):
-	route += route
-	ns = Namespace()
-	ns.clientEmail = ''
-	ns.hashedClientData = ''
+
+	route += '?'
+	clientEmail = ''
+	hashedClientData = ''
+
 
 	for key in request.form:
+		print key
 		if key == "clientEmail":
-			ns.clientEmail = request.form[key]
+			clientEmail = request.form[key]
 		elif key == "hashedClientData":
-			ns.hashedClientData = request.form[key]
+			hashedClientData = request.form[key]
 		else:
 			route += key +'='+request.form[key]+'&'
 
-		# removes the last & 
-		route = route[:-1]
-
-		return verifyToken(route, ns.clientEmail, ns.hashedClientData)
+	
+	# removes the last & 
+	route = route[:-1]
+	print route
+	return verifyToken(route, clientEmail, hashedClientData, True)
 
 if __name__ == '__main__':
 	# database_helper.init_db(app)

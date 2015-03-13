@@ -72,7 +72,6 @@ changePassword = function(){
 	var pass2 = document.getElementById("changePass2").value;
 	if (pass1 != pass2){
 		document.getElementById("labelAlertChangePw").innerHTML = "Passwords do not match";
-		console.log("---------------f---");
 	} else{
 		
 		var xmlhttp=new XMLHttpRequest();
@@ -87,14 +86,17 @@ changePassword = function(){
 		    }
 		}
 
-		var params = "old_password=" + document.getElementById("currentPass").value;
-		params += "&new_password="+ pass1;
+		
+		var params = "new_password="+ pass1;
+		params += "&old_password=" + document.getElementById("currentPass").value;
 		params += "&clientEmail="+localStorage.getItem("email");
-		var hashedData = CryptoJS.SHA256("/changepassword" + params + localStorage.getItem("token"));
+		var dataToHash = "/changepassword?" + params + "&token="+localStorage.getItem("token");
+		var hashedData = CryptoJS.SHA256(dataToHash);
 		params += "&hashedClientData=" + hashedData
 
+		console.log(dataToHash)
+
 		sendPOSTrequest(xmlhttp,"/changepassword", params);
-		console.log(params);
 	}
 	return false;
 }
@@ -213,8 +215,7 @@ postMessage = function(view){
 		return;
 	};
 
-	var token = localStorage.getItem("token");
-	params = "token="+token+"&email="+email+"&message="+message;
+	
 
 	var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function(){
@@ -231,6 +232,14 @@ postMessage = function(view){
 		    	};
 	    	};
 		};
+
+	var params = "message="+message+"&email="+email;
+	params += "&clientEmail="+localStorage.getItem("email");
+	var dataToHash = "/postmessage?" + params + "&token="+localStorage.getItem("token");
+	var hashedData = CryptoJS.SHA256(dataToHash);
+
+	params += "&hashedClientData=" + hashedData;
+	
 
 	sendPOSTrequest(xmlhttp, "/postmessage", params);
 
