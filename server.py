@@ -224,7 +224,7 @@ def verifyToken(route, clientEmail, hashedClientData, post=False):
 		dataToHash = '/'+route+'/'+clientEmail+'/'+serverToken
 
 	# encode string to bytes when hashing
-	server_hash = hashlib.sha256(dataToHash.encode()).hexdigest()
+	server_hash = hashlib.sha256(dataToHash.encode('utf-8')).hexdigest()
 
 	print 'dataToHash: ' + dataToHash
 	print 'Hash from client: ' + server_hash

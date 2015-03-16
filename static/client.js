@@ -264,8 +264,22 @@ writeWall = function(page, response){
 		// var h = response.data[i].split(",")
 		var message = data[2];
 		var user = data[1];
-		document.getElementById("messageWall"+page).innerHTML += "<label class=\"labelWall\">" + message + " By:" + user + "</label> <br>";
+		document.getElementById("messageWall"+page).innerHTML += "<label id=\"drag"+i+"\" draggable=\"true\" ondragstart=\"drag(event)\" class=\"labelWall\">" + message + " By:" + user + "</label> <br>";
 	};
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    ev.target.value=document.getElementById(data).innerHTML;
 }
 
 findUser = function(){

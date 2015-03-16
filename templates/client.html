@@ -117,7 +117,7 @@
 
 					<div class="wall" id="userWall">
 						
-						<textarea id="message" placeholder="Write a message"></textarea><br>
+						<textarea id="message" placeholder="Write a message" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea><br>
 						<button onclick="postMessageHome()">Send</button>
 						<button onclick="updateWall()"> Update </button> <br>
 
@@ -167,7 +167,7 @@
 					</div>
 					<div class=wall>
 						<div id="userWall2" class="hide">
-							<textarea id="messageBrowse" placeholder="Write a message"></textarea><br>
+							<textarea id="messageBrowse" placeholder="Write a message" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea><br>
 							<button onclick="postMessageBrowse()">Send</button>
 							<button onclick="updateWallBrowse()"> Update </button> <br>
 							<div id="messageWallBrowse" class="wallOfText"></div>
